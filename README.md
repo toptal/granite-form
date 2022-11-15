@@ -1,15 +1,15 @@
-[![Build Status](https://travis-ci.org/pyromaniac/active_data.png?branch=master)](https://travis-ci.org/pyromaniac/active_data)
-[![Code Climate](https://codeclimate.com/github/pyromaniac/active_data.png)](https://codeclimate.com/github/pyromaniac/active_data)
+[![Build Status](https://travis-ci.org/toptal/granite-form.png?branch=master)](https://travis-ci.org/toptal/granite-form)
+[![Code Climate](https://codeclimate.com/github/toptal/granite-form.png)](https://codeclimate.com/github/toptal/granite-form)
 
-# ActiveData
+# Granite::Form
 
-ActiveData is a ActiveModel-based front-end for your data. You might need to use it in the following cases:
+Granite::Form is a ActiveModel-based front-end for your data. You might need to use it in the following cases:
 
 * When you need a form objects pattern.
 
 ```ruby
 class ProfileForm
-  include ActiveData::Model
+  include Granite::Form::Model
 
   attribute 'first_name', String
   attribute 'last_name', String
@@ -47,7 +47,7 @@ end
 
 ```ruby
 class Flight
-  include ActiveData::Model
+  include Granite::Form::Model
 
   attribute :airline, String
   attribute :number, String
@@ -79,7 +79,7 @@ end
 
 ```ruby
 class Answer
-  include ActiveData::Model
+  include Granite::Form::Model
 
   attribute :question_id, Integer
   attribute :content, String
@@ -101,7 +101,7 @@ q.save
 
 ## Why?
 
-ActiveData is an ActiveModel-based library that provides the following abilities:
+Granite::Form is an ActiveModel-based library that provides the following abilities:
 
   * Standard form objects building toolkit: attributes with typecasting, validations, etc.
   * High-level universal ORM/ODM library using any data source (DB, http, redis, text files).
@@ -118,7 +118,7 @@ Key features:
 
 Add this line to your application's Gemfile:
 
-    gem 'active_data'
+    gem 'granite-form'
 
 And then execute:
 
@@ -126,19 +126,19 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install active_data
+    $ gem install granite-form
 
 ## Usage
 
-ActiveData has modular architecture, so it is required to include modules to obtain additional features. By default ActiveData supports attributes definition and validations.
+Granite::Form has modular architecture, so it is required to include modules to obtain additional features. By default Granite::Form supports attributes definition and validations.
 
 ### Attributes
 
-ActiveData provides several types of attributes and typecasts each attribute to its defined type upon initialization.
+Granite::Form provides several types of attributes and typecasts each attribute to its defined type upon initialization.
 
 ```ruby
 class Book
-  include ActiveData::Model
+  include Granite::Form::Model
 
   attribute :title, String
   collection :author_ids, Integer
@@ -156,8 +156,8 @@ By default, if type for attribute is not set, it is defined with `Object` type, 
 Type is necessary for attribute typecasting. Here is the list of pre-defined basic typecasters:
 
 ```irb
-[1] pry(main)> ActiveData._typecasters.keys
-=> ["Object", "String", "Array", "Hash", "Date", "DateTime", "Time", "ActiveSupport::TimeZone", "BigDecimal", "Float", "Integer", "Boolean", "ActiveData::UUID"]
+[1] pry(main)> Granite::Form._typecasters.keys
+=> ["Object", "String", "Array", "Hash", "Date", "DateTime", "Time", "ActiveSupport::TimeZone", "BigDecimal", "Float", "Integer", "Boolean", "Granite::Form::UUID"]
 ```
 
 In addition, you can provide any class type when defining the attribute, but in that case you will be able to only assign instances of that specific class or value nil:
@@ -190,7 +190,7 @@ attribute :direction, String, enum: %w[north south east west]
 Normalizers are applied last, modifying typecast value. It is possible to provide a list of normalizers, they will be applied in the order. It is possible to pre-define normalizers to DRY code:
 
 ```ruby
-ActiveData.normalizer(:trim) do |value, options, _attribute|
+Granite::Form.normalizer(:trim) do |value, options, _attribute|
   value.first(options[:length] || 2)
 end
 
@@ -211,7 +211,7 @@ Collection is simply an array of equally-typed values:
 
 ```ruby
 class Panda
-  include ActiveData::Model
+  include Granite::Form::Model
 
   collection :ids, Integer
 end
@@ -236,7 +236,7 @@ Dictionary field is a hash of specified type values with string keys:
 
 ```ruby
 class Foo
-  include ActiveData::Model
+  include Granite::Form::Model
 
   dictionary :ordering, String
 end
@@ -263,21 +263,21 @@ localized :title, String
 
 Represents provides an easy way to expose model attributes through an interface.
 It will automatically set passed value to the represented object **before validation**.
-You can use any ActiveRecord, ActiveModel or ActiveData object as a target of representation.
+You can use any ActiveRecord, ActiveModel or Granite::Form object as a target of representation.
 A type of an attribute will be taken from it.
 If there is no type, it will be `Object` by default. You can set the type explicitly by passing the `type: TypeClass` option.
 Represents will also add automatic validation of the target object.
 
 ```ruby
 class Person
-  include ActiveData::Model
+  include Granite::Form::Model
 
   attribute :name, String
 end
 
 class Doctor
-  include ActiveData::Model
-  include ActiveData::Model::Representation
+  include Granite::Form::Model
+  include Granite::Form::Model::Representation
 
   attribute :person, Object
   represents :name, of: :person
@@ -295,7 +295,7 @@ person.name
 
 ### Associations
 
-ActiveData provides a set of associations. There are two types of them: referenced and embedded. The closest example of referenced association is AR `belongs_to` and as for embedded ones - Mongoid's embedded. Also these associations support `accepts_nested_attributes` call.
+Granite::Form provides a set of associations. There are two types of them: referenced and embedded. The closest example of referenced association is AR `belongs_to` and as for embedded ones - Mongoid's embedded. Also these associations support `accepts_nested_attributes` call.
 
 #### EmbedsOne
 
@@ -390,8 +390,8 @@ Adapter definition syntax:
 ```ruby
 class Mongoid::Document
   # anything that have similar interface to
-  # ActiveData::Model::Associations::PersistenceAdapters::Base
-  def self.active_data_persistence_adapter
+  # Granite::Form::Model::Associations::PersistenceAdapters::Base
+  def self.granite_persistence_adapter
     MongoidAdapter
   end
 end
@@ -402,9 +402,9 @@ Where
 `primary_key` - key to search data
 `scope_proc` - additional proc for filtering
 
-All required interface for adapters described in `ActiveData::Model::Associations::PersistenceAdapters::Base`.
+All required interface for adapters described in `Granite::Form::Model::Associations::PersistenceAdapters::Base`.
 
-Adapter for ActiveRecord is `ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord`. So, all AR models will use `PersistenceAdapters::ActiveRecord` by default.
+Adapter for ActiveRecord is `Granite::Form::Model::Associations::PersistenceAdapters::ActiveRecord`. So, all AR models will use `PersistenceAdapters::ActiveRecord` by default.
 
 ### Primary
 
