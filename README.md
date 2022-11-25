@@ -3,7 +3,7 @@
 
 # Granite::Form
 
-Granite::Form is a ActiveModel-based front-end for your data. You might need to use it in the following cases:
+`Granite::Form` is an `ActiveModel`-based front-end for your data. It is useful in the following cases:
 
 * When you need a form objects pattern.
 
@@ -43,7 +43,7 @@ class ProfileController < ApplicationController
 end
 ```
 
-* When you need to work with data-storage in ActiveRecord style with
+* When you need to work with data storage à la `ActiveRecord`.
 
 ```ruby
 class Flight
@@ -75,7 +75,7 @@ class Flight
 end
 ```
 
-* When you need to implement embedded objects for ActiveRecord models
+* When you need to embed objects in `ActiveRecord` models.
 
 ```ruby
 class Answer
@@ -94,25 +94,25 @@ class Quiz < ActiveRecord::Base
   validates :answers, associated: true
 end
 
-q = Quiz.new
-q.answers.build(question_id: 42, content: 'blabla')
-q.save
+quiz = Quiz.new
+quiz.answers.build(question_id: 42, content: 'blabla')
+quiz.save
 ```
 
 ## Why?
 
-Granite::Form is an ActiveModel-based library that provides the following abilities:
+`Granite::Form` is an `ActiveModel-based library that provides the following functionalities:
 
   * Standard form objects building toolkit: attributes with typecasting, validations, etc.
   * High-level universal ORM/ODM library using any data source (DB, http, redis, text files).
-  * Embedding objects into your ActiveRecord entities. Quite useful with PG JSON capabilities.
+  * Embedding objects into ActiveRecord entities. Quite useful with PG JSON capabilities.
 
 Key features:
 
-  * Complete objects lifecycle support: saving, updating, destroying.
+  * Complete object lifecycle support: saving, updating, destroying.
   * Embedded and referenced associations.
-  * Backend-agnostic named scopes functionality.
-  * Callbacks, validations and dirty attributes inside.
+  * Backend-agnostic named scopes.
+  * Callbacks, validations and dirty attributes.
 
 ## Installation
 
@@ -130,11 +130,11 @@ Or install it yourself as:
 
 ## Usage
 
-Granite::Form has modular architecture, so it is required to include modules to obtain additional features. By default Granite::Form supports attributes definition and validations.
+`Granite::Form` has modular architecture, so it is required to include modules to obtain additional features. By default `Granite::Form` supports attributes definition and validations.
 
 ### Attributes
 
-Granite::Form provides several types of attributes and typecasts each attribute to its defined type upon initialization.
+`Granite::Form` provides several types of attributes and typecasts each attribute to its defined type upon initialization.
 
 ```ruby
 class Book
@@ -151,16 +151,16 @@ end
 attribute :full_name, String, default: 'John Talbot'
 ```
 
-By default, if type for attribute is not set, it is defined with `Object` type, so it would be a great idea to specify type for every attribute explicitly.
+If type for an attribute is not set, it defaults to `Object`. It is therefore recommended to specify the type for every attribute explicitly.
 
-Type is necessary for attribute typecasting. Here is the list of pre-defined basic typecasters:
+The type is necessary for attribute typecasting. Here is the list of pre-defined basic typecasters:
 
 ```irb
 [1] pry(main)> Granite::Form._typecasters.keys
 => ["Object", "String", "Array", "Hash", "Date", "DateTime", "Time", "ActiveSupport::TimeZone", "BigDecimal", "Float", "Integer", "Boolean", "Granite::Form::UUID"]
 ```
 
-In addition, you can provide any class type when defining the attribute, but in that case you will be able to only assign instances of that specific class or value nil:
+In addition, you can provide any class type when defining an attribute, but in that case you will be able to only assign instances of that specific class or `nil`:
 
 ```ruby
 attribute :template, MyCustomTemplateType
@@ -168,7 +168,7 @@ attribute :template, MyCustomTemplateType
 
 ##### Defaults
 
-It is possible to provide default values for attributes and they will act in the same way as AR or Mongoid default values:
+It is possible to provide default values for attributes and they will act in the same way as `ActiveRecord` or `Mongoid` default values:
 
 ```ruby
 attribute :check, Boolean, default: false # Simply false by default
@@ -179,7 +179,7 @@ attribute :today_wday, Integer, default: ->(instance) { instance.today.wday } # 
 
 ##### Enums
 
-Enums restrict the scope of possible values for attribute. If assigned value is not included in provided list - then it turns to nil:
+Enums restrict the scope of possible values for an attribute. If the assigned value is not included in the provided list, the attribute value is set to `nil`:
 
 ```ruby
 attribute :direction, String, enum: %w[north south east west]
@@ -187,7 +187,7 @@ attribute :direction, String, enum: %w[north south east west]
 
 ##### Normalizers
 
-Normalizers are applied last, modifying typecast value. It is possible to provide a list of normalizers, they will be applied in the order. It is possible to pre-define normalizers to DRY code:
+Normalizers are applied last, modifying a typecast value. It is possible to provide a list of normalizers. They will be applied in the provided order. It is possible to pre-define normalizers to DRY code:
 
 ```ruby
 Granite::Form.normalizer(:trim) do |value, options, _attribute|
@@ -201,13 +201,13 @@ attribute :title, String, normalizers: [->(value) { value.strip }, trim: {length
 
 ```ruby
 attribute :name, String, readonly: true # Readonly forever
-attribute :name, String, readonly: ->{ true } # Conditionally readonly
+attribute :name, String, readonly: -> { true } # Conditionally readonly
 attribute :name, String, readonly: ->(instance) { instance.subject.present? } # Explicit instance
 ```
 
 #### Collection
 
-Collection is simply an array of equally-typed values:
+A collection is simply an array of equally-typed values:
 
 ```ruby
 class Panda
@@ -217,7 +217,7 @@ class Panda
 end
 ```
 
-Collection typecasts each value to specified type and also no matter what are you going to pass - it will be an array.
+A collection typecasts each value to the specified type. Also, it normalizes any given value to an array.
 
 ```irb
 [1] pry(main)> Panda.new
@@ -228,11 +228,11 @@ Collection typecasts each value to specified type and also no matter what are yo
 => #<Panda ids: [42, 33]>
 ```
 
-Default and enum modifiers are applied to every value, normalizer will be applied to the whole array.
+Default and enum modifiers are applied on each value, normalizers are applied on the array.
 
 #### Dictionary
 
-Dictionary field is a hash of specified type values with string keys:
+A dictionary field is a hash of specified type values with string keys:
 
 ```ruby
 class Foo
@@ -249,11 +249,11 @@ end
 => #<Foo ordering: {"name"=>"desc"}>
 ```
 
-Keys list might be restricted with `:keys` option, defaults and enums are applied to every value, normalizers are applied to the whole hash.
+The keys list might be restricted with the `:keys` option. Default and enum modifiers are applied on each value, normalizers are applied on the hash.
 
 #### Localized
 
-Localized is similar to how Globalize 3 attributes work.
+`localized` is similar to how `Globalize 3` attributes work.
 
 ```ruby
 localized :title, String
@@ -261,11 +261,11 @@ localized :title, String
 
 #### Represents
 
-Represents provides an easy way to expose model attributes through an interface.
-It will automatically set passed value to the represented object **before validation**.
-You can use any ActiveRecord, ActiveModel or Granite::Form object as a target of representation.
-A type of an attribute will be taken from it.
-If there is no type, it will be `Object` by default. You can set the type explicitly by passing the `type: TypeClass` option.
+`represents` provides an easy way to expose model attributes through an interface.
+It will automatically set the passed value to the represented object **before validation**.
+You can use any `ActiveRecord`, `ActiveModel` or `Granite::Form` object as a target of representation.
+The type of an attribute will be taken from it.
+If no type is defined, it will be `Object` by default. You can set the type explicitly by passing the `type: TypeClass` option.
 Represents will also add automatic validation of the target object.
 
 ```ruby
@@ -295,7 +295,7 @@ person.name
 
 ### Associations
 
-Granite::Form provides a set of associations. There are two types of them: referenced and embedded. The closest example of referenced association is AR `belongs_to` and as for embedded ones - Mongoid's embedded. Also these associations support `accepts_nested_attributes` call.
+`Granite::Form` provides a set of associations. There are two types: referenced and embedded. The closest example of referenced association is `AcitveRecord`'s `belongs_to`. For embedded ones - Mongoid's embedded. Also these associations support `accepts_nested_attributes` calls.
 
 #### EmbedsOne
 
@@ -312,11 +312,11 @@ embeds_one :profile do
 end
 ```
 
-Possible options:
+Оptions:
 
 * `:class_name` - association class name
-* `:validate` - true or false
-* `:default` - default value for association: attributes hash or instance of defined class
+* `:validate` - `true` or `false`
+* `:default` - default value for the association: an attributes hash or an instance of the defined class
 
 #### EmbedsMany
 
@@ -324,7 +324,7 @@ Possible options:
 embeds_many :tags
 ```
 
-Defines collection of embedded objects. Might be defined inline:
+Defines a collection of embedded objects. Might be defined inline:
 
 ```ruby
 embeds_many :tags do
@@ -332,9 +332,11 @@ embeds_many :tags do
 end
 ```
 
+Оptions:
+
 * `:class_name` - association class name
-* `:validate` - true or false
-* `:default` - default value for association: attributes hash collection or instances of defined class
+* `:validate` -  `true` or `false`
+* `:default` - default value for the association: an attributes hash or an instance of the defined class
 
 #### ReferencesOne
 
@@ -342,22 +344,22 @@ end
 references_one :user
 ```
 
-This will provide several methods to the object: `#user`, `#user=`, `#user_id` and `#user_id=`, just as would occur with an ActiveRecord association.
+Provides several methods to the object: `#user`, `#user=`, `#user_id` and `#user_id=`, similarly to an ActiveRecord association.
 
-Possible options:
+Оptions:
 
 * `:class_name` - association class name
-* `:primary_key` - associated object primary key (`:id` by default):
+* `:primary_key` - the associated object's primary key name (`:id` by default):
 
   ```ruby
   references_one :user, primary_key: :name
   ```
 
-  This will create the following methods: `#user`, `#user=`, `#user_name` and `#user_name=`
+  Creates the following methods: `#user`, `#user=`, `#user_name` and `#user_name=`.
 
 * `:reference_key` - redefines `#user_id` and `#user_id=` method names completely.
-* `:validate` - true or false
-* `:default` - default value for association: reference or object itself
+* `:validate` - `true` or `false`
+* `:default` - default value for the association: reference or the object itself
 
 #### ReferencesMany
 
@@ -365,18 +367,18 @@ Possible options:
 references_many :users
 ```
 
-This will provide several methods to the object: `#users`, `#users=`, `#user_ids` and `#user_ids=` just as an ActiveRecord relation does.
+Provides several methods to the object: `#users`, `#users=`, `#user_ids` and `#user_ids=`, similarly to an ActiveRecord association.
 
-Possible options:
+Options:
 
 * `:class_name` - association class name
-* `:primary_key` - associated object primary key (`:id` by default):
+* `:primary_key` - the associated object's primary key name (`:id` by default):
 
   ```ruby
   references_many :users, primary_key: :name
   ```
 
-  This will create the following methods: `#users`, `#users=`, `#user_names` and `#user_names=`
+  Creates the following methods: `#users`, `#users=`, `#user_names` and `#user_names=`.
 
 * `:reference_key` - redefines `#user_ids` and `#user_ids=` method names completely.
 * `:validate` - true or false
@@ -396,15 +398,15 @@ class Mongoid::Document
   end
 end
 ```
-Where
+where
 `ClassName` - name of model class or one of ancestors
 `data_source` - name of data source class
 `primary_key` - key to search data
 `scope_proc` - additional proc for filtering
 
-All required interface for adapters described in `Granite::Form::Model::Associations::PersistenceAdapters::Base`.
+All requirements for the adapter interfaces are described in `Granite::Form::Model::Associations::PersistenceAdapters::Base`.
 
-Adapter for ActiveRecord is `Granite::Form::Model::Associations::PersistenceAdapters::ActiveRecord`. So, all AR models will use `PersistenceAdapters::ActiveRecord` by default.
+The adapter for `ActiveRecord` is `Granite::Form::Model::Associations::PersistenceAdapters::ActiveRecord`. All `ActiveRecord` models use `PersistenceAdapters::ActiveRecord` by default.
 
 ### Primary
 
