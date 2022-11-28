@@ -126,13 +126,25 @@ describe Granite::Form::Model::Representation do
 
     specify do
       expect { post.validate }.to change { post.errors.messages }
-        .to(hash_including('author.user.email': ['is invalid'], name: ["can't be blank"]))
+        .to('author.user.email': ['is invalid'], name: ["can't be blank"])
     end
 
     if ActiveModel.version >= Gem::Version.new('6.1.0')
       specify do
         expect { post.validate }.to change { post.errors.details }
-          .to(hash_including('author.user.email': [{error: 'is invalid'}], name: [{error: :blank}]))
+          .to('author.user.email': [{error: 'is invalid'}], name: [{error: :blank}])
+      end
+    end
+
+    context 'when using symbol in error message of represented model' do
+      before do
+        Author.validates :name, inclusion: {in: ['Author'], message: :invalid_name, allow_blank: true}
+        post.author.name = 'Not Author'
+      end
+
+      specify do
+        expect { post.validate }.to change { post.errors.messages }
+          .to('author.user.email': ['is invalid'], name: ['must be Author'])
       end
     end
   end
