@@ -8,8 +8,7 @@ require 'rack/test'
 require 'action_controller/metal/strong_parameters'
 require 'database_cleaner'
 
-require 'support/model_helpers'
-require 'support/muffle_helper'
+Dir[File.join(__dir__, 'support', '**', '*.rb')].sort.each { |f| require f }
 
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 ActiveRecord::Base.logger = Logger.new('/dev/null')
