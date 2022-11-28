@@ -1,5 +1,7 @@
 # master
 
+## Next
+
 ## v0.1.1
 
 - Fixed represented error message copying when represented model uses symbols for `message`. 

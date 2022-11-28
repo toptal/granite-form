@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'actionpack', '>= 4.0'
   gem.add_development_dependency 'activerecord', '>= 4.0'
   gem.add_development_dependency 'appraisal'
+  gem.add_development_dependency 'bump'
   gem.add_development_dependency 'database_cleaner'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 3.7.0'
