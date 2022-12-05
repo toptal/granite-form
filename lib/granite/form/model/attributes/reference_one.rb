@@ -24,20 +24,12 @@ module Granite
 
           def type_casted_value
             variable_cache(:value) do
-              typecast(read_before_type_cast)
+              type_definition.ensure_type(read_before_type_cast)
             end
           end
 
           def read_before_type_cast
             @value_cache
-          end
-
-          def type
-            @type ||= association.reflection.persistence_adapter.primary_key_type
-          end
-
-          def typecaster
-            @typecaster ||= Granite::Form.typecaster(type.ancestors.grep(Class))
           end
 
         private

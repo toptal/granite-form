@@ -47,20 +47,32 @@ describe Granite::Form::Config do
 
   describe '#typecaster' do
     specify do
-      expect { subject.typecaster('Object') {} }
-        .to change { muffle(Granite::Form::TypecasterMissing) { subject.typecaster(Time, Object) } }
-        .from(nil).to(an_instance_of(Proc))
+      expect { subject.typecaster('Object', &:to_s) }
+        .to change { subject.types['Object'] }.from(nil).to(an_instance_of(Class))
+
+      expect(subject.types['Object'].new(Object, nil, stub_model.new).typecast(1)).to eq('1')
     end
+
     specify do
-      expect { subject.typecaster('Object') {} }
-        .to change { muffle(Granite::Form::TypecasterMissing) { subject.typecaster('time', 'object') } }
-        .from(nil).to(an_instance_of(Proc))
+      expect { subject.typecaster(Object) {} }
+        .to change { subject.types['Object'] }.from(nil).to(an_instance_of(Class))
     end
+
     specify do
-      expect { subject.typecaster('Object') {} }
-        .to change { muffle(Granite::Form::TypecasterMissing) { subject.typecaster(Object) } }
-        .from(nil).to(an_instance_of(Proc))
+      expect { subject.typecaster('object') {} }
+        .to change { subject.types['Object'] }.from(nil).to(an_instance_of(Class))
     end
-    specify { expect { subject.typecaster(Object) }.to raise_error Granite::Form::TypecasterMissing }
+  end
+
+  describe '#type_for' do
+    let(:definition) { subject.types['Numeric'] }
+
+    before { subject.typecaster('Numeric') {} }
+
+    specify do
+      expect(subject.type_for(Numeric)).to eq(definition)
+      expect(subject.type_for(Integer)).to eq(definition)
+      expect { subject.type_for(String) }.to raise_error(Granite::Form::TypecasterMissing)
+    end
   end
 end

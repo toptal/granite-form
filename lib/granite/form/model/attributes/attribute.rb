@@ -14,7 +14,7 @@ module Granite
 
           def read
             variable_cache(:value) do
-              normalize(enumerize(typecast(read_before_type_cast)))
+              normalize(enumerize(type_definition.ensure_type(read_before_type_cast)))
             end
           end
 

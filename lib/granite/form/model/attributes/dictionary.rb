@@ -11,7 +11,7 @@ module Granite
                          hash = hash.stringify_keys.slice(*keys) if keys.present?
 
                          normalize(Hash[hash.map do |key, value|
-                           [key, enumerize(typecast(value))]
+                           [key, enumerize(type_definition.ensure_type(value))]
                          end].with_indifferent_access).with_indifferent_access
                        end
           end

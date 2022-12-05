@@ -3,8 +3,9 @@ module Granite
     module Model
       module Attributes
         class Base
-          attr_reader :reflection, :owner
-          delegate :name, :type, :typecaster, :readonly, to: :reflection
+          attr_reader :owner, :reflection
+          delegate :name, :readonly, to: :reflection
+          delegate :type, to: :type_definition
 
           def initialize(reflection, owner)
             @reflection = reflection
@@ -51,16 +52,12 @@ module Granite
             !(read.respond_to?(:zero?) ? read.zero? : read.blank?)
           end
 
-          def typecast(value)
-            if value.instance_of?(type)
-              value
-            else
-              typecaster.call(value, self) unless value.nil?
-            end
-          end
-
           def readonly?
             !!(readonly.is_a?(Proc) ? evaluate(&readonly) : readonly)
+          end
+
+          def type_definition
+            @type_definition ||= build_type_definition(reflection.type)
           end
 
           def inspect_attribute
@@ -98,6 +95,10 @@ module Granite
           end
 
         private
+
+          def build_type_definition(type)
+            Granite::Form.type_for(type).new(type, reflection, owner)
+          end
 
           def evaluate(*args, &block)
             if block.arity >= 0 && block.arity <= args.length

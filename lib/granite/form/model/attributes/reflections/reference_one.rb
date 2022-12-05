@@ -30,10 +30,6 @@ module Granite
               RUBY
             end
 
-            def type
-              Object
-            end
-
             def inspect_reflection
               "#{name}: (reference)"
             end

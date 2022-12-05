@@ -14,7 +14,9 @@ module Granite
 
               target.add_attribute(
                 Granite::Form::Model::Attributes::Reflections::ReferenceOne,
-                reflection.reference_key, association: name
+                reflection.reference_key,
+                type: reflection.persistence_adapter.primary_key_type,
+                association: name
               )
 
               reflection

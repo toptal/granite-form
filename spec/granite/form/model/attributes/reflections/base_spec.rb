@@ -36,7 +36,7 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
       stub_class(:owner)
     end
 
-    let(:reflection) { SomeScope::Borogoves.new(:field) }
+    let(:reflection) { SomeScope::Borogoves.new(:field, type: Object) }
     let(:owner) { Owner.new }
 
     specify { expect(reflection.build_attribute(owner, nil)).to be_a(Granite::Form::Model::Attributes::Borogoves) }

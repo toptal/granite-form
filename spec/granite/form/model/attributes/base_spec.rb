@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe Granite::Form::Model::Attributes::Base do
+  let(:model) { Dummy.new }
+
   before { stub_model(:dummy) }
 
   def attribute(*args)
     options = args.extract_options!
-    Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Base, :field, options)
-    Dummy.new.attribute(:field)
+    Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Base, :field, options.reverse_merge(type: Object))
+    model.attribute(:field)
   end
 
   describe '#read' do
@@ -93,5 +95,12 @@ describe Granite::Form::Model::Attributes::Base do
     specify { expect(attribute(readonly: true)).to be_readonly }
     specify { expect(attribute(readonly: -> { false })).not_to be_readonly }
     specify { expect(attribute(readonly: -> { true })).to be_readonly }
+  end
+
+  describe '#type_definition' do
+    subject { attr.type_definition }
+    let(:attr) { attribute(type: String) }
+
+    it { is_expected.to have_attributes(type: String, reflection: subject.reflection, owner: model) }
   end
 end
