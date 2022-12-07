@@ -114,134 +114,78 @@ describe Granite::Form::Model::Validations::NestedValidator do
 
   context 'object field is invalid and referenced object does not include AutosaveAssociation' do
     before do
-      stub_class(:validated_object) do
-        include Granite::Form::Model::Validations
-        include Granite::Form::Model::Attributes
-        include Granite::Form::Model::Primary
-
-        primary :id
+      stub_model(:validated_object) do
         attribute :title, String
         validates_presence_of :title
       end
 
-      Main.class_eval do
-        include Granite::Form::Model::Associations
+      stub_model(:main) do
+        include Granite::Form::Model::Persistence
+
         attribute :object, Object
         validates :object, nested: true
-      end
-    end
-
-    subject(:instance) { Main.instantiate name: 'hello', object: object, validated_one: {name: 'name'} }
-
-    context do
-      let(:object) { ValidatedObject.new(title: 'Mr.') }
-      it { is_expected.to be_valid }
-    end
-
-    context do
-      let(:object) { ValidatedObject.new }
-      it do
-        expect { subject.valid? }.not_to raise_error
-        expect(subject).not_to be_valid
-        expect(subject.errors.count).to eq(1)
-      end
-    end
-  end
-
-  context 'object field is invalid and has representation of that field' do
-    before do
-      stub_class(:validated_object) do
-        include Granite::Form::Model::Validations
-        include Granite::Form::Model::Attributes
-        include Granite::Form::Model::Primary
-
-        primary :id
-        attribute :title, String
-        validates_presence_of :title
-      end
-
-      Main.class_eval do
-        include Granite::Form::Model::Associations
-        include Granite::Form::Model::Representation
-        represents :title, of: :object
-        attribute :object, Object
-        validates :object, nested: true
-      end
-
-      Main.class_eval do
-        include Granite::Form::Model::Representation
-        represents :title, of: :object
       end
     end
 
     subject(:instance) { Main.instantiate name: 'hello', object: object }
 
-    context do
+    context 'nested object is valid' do
       let(:object) { ValidatedObject.new(title: 'Mr.') }
+
       it { is_expected.to be_valid }
     end
 
-    context do
+    context 'nested object is invalid' do
       let(:object) { ValidatedObject.new }
+
       it do
         expect { subject.valid? }.not_to raise_error
         expect(subject).not_to be_valid
         expect(subject.errors.count).to eq(1)
       end
-    end
 
-    context 'validation has condition' do
-      before do
-        stub_class(:validated_object) do
-          include Granite::Form::Model::Validations
-          include Granite::Form::Model::Attributes
-          include Granite::Form::Model::Primary
+      context 'nested validation runs twice' do
+        before do
+          stub_model(:main) do
+            include Granite::Form::Model::Persistence
 
-          primary :id
-          attribute :title, String
-          validates_presence_of :title, if: -> { true }
+            attribute :object, Object
+            validates :object, nested: true
+            validates :object, nested: true
+          end
         end
-      end
 
-      context do
-        let(:object) { ValidatedObject.new(title: 'Mr.') }
-        it { is_expected.to be_valid }
-      end
-
-      context do
-        let(:object) { ValidatedObject.new }
         it do
-          expect { subject.valid? }.not_to raise_error
-          expect(subject).not_to be_valid
+          subject.validate
           expect(subject.errors.count).to eq(1)
         end
-      end
-    end
 
-    context 'validation has message' do
-      before do
-        stub_class(:validated_object) do
-          include Granite::Form::Model::Validations
-          include Granite::Form::Model::Attributes
-          include Granite::Form::Model::Primary
+        context 'nested object validation has condition' do
+          before do
+            stub_model(:validated_object) do
+              attribute :title, String
+              validates_presence_of :title, if: -> { true }
+            end
+          end
 
-          primary :id
-          attribute :title, String
-          validates_presence_of :title, message: 'test message'
+          it do
+            subject.validate
+            expect(subject.errors.count).to eq(1)
+          end
         end
-      end
 
-      context do
-        let(:object) { ValidatedObject.new(title: 'Mr.') }
-        it { is_expected.to be_valid }
-      end
+        context 'nested object validation has message' do
+          before do
+            stub_model(:validated_object) do
+              attribute :title, String
+              validates_presence_of :title, message: 'test'
+            end
+          end
 
-      context do
-        let(:object) { ValidatedObject.new }
-        it do
-          expect { subject.valid? }.not_to raise_error
-          expect(subject).not_to be_valid
-          expect(subject.errors.count).to eq(1)
+          it do
+            subject.validate
+            expect(subject.errors.count).to eq(1)
+          end
         end
       end
     end
