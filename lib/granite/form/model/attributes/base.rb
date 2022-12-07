@@ -3,17 +3,13 @@ module Granite
     module Model
       module Attributes
         class Base
-          attr_reader :name, :owner
-          delegate :type, :typecaster, :readonly, to: :reflection
+          attr_reader :reflection, :owner
+          delegate :name, :type, :typecaster, :readonly, to: :reflection
 
-          def initialize(name, owner)
-            @name = name
+          def initialize(reflection, owner)
+            @reflection = reflection
             @owner = owner
             @origin = :default
-          end
-
-          def reflection
-            @owner.class._attributes[name]
           end
 
           def write_value(value, origin: :user)

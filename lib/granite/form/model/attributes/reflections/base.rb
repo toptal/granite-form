@@ -27,7 +27,7 @@ module Granite
             end
 
             def build_attribute(owner, raw_value = Granite::Form::UNDEFINED)
-              attribute = self.class.attribute_class.new(name, owner)
+              attribute = self.class.attribute_class.new(self, owner)
               attribute.write_value(raw_value, origin: :persistence) unless raw_value == Granite::Form::UNDEFINED
               attribute
             end

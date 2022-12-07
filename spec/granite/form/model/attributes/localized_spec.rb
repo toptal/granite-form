@@ -6,7 +6,7 @@ describe Granite::Form::Model::Attributes::Localized do
   def attribute(*args)
     options = args.extract_options!
     Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Localized, :field, options)
-    described_class.new('field', Dummy.new)
+    Dummy.new.attribute(:field)
   end
 
   describe '#read' do
