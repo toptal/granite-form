@@ -143,6 +143,106 @@ describe Granite::Form::Model::Validations::NestedValidator do
       it do
         expect { subject.valid? }.not_to raise_error
         expect(subject).not_to be_valid
+        expect(subject.errors.count).to eq(1)
+      end
+    end
+  end
+
+  context 'object field is invalid and has representation of that field' do
+    before do
+      stub_class(:validated_object) do
+        include Granite::Form::Model::Validations
+        include Granite::Form::Model::Attributes
+        include Granite::Form::Model::Primary
+
+        primary :id
+        attribute :title, String
+        validates_presence_of :title
+      end
+
+      Main.class_eval do
+        include Granite::Form::Model::Associations
+        include Granite::Form::Model::Representation
+        represents :title, of: :object
+        attribute :object, Object
+        validates :object, nested: true
+      end
+
+      Main.class_eval do
+        include Granite::Form::Model::Representation
+        represents :title, of: :object
+      end
+    end
+
+    subject(:instance) { Main.instantiate name: 'hello', object: object }
+
+    context do
+      let(:object) { ValidatedObject.new(title: 'Mr.') }
+      it { is_expected.to be_valid }
+    end
+
+    context do
+      let(:object) { ValidatedObject.new }
+      it do
+        expect { subject.valid? }.not_to raise_error
+        expect(subject).not_to be_valid
+        expect(subject.errors.count).to eq(1)
+      end
+    end
+
+    context 'validation has condition' do
+      before do
+        stub_class(:validated_object) do
+          include Granite::Form::Model::Validations
+          include Granite::Form::Model::Attributes
+          include Granite::Form::Model::Primary
+
+          primary :id
+          attribute :title, String
+          validates_presence_of :title, if: -> { true }
+        end
+      end
+
+      context do
+        let(:object) { ValidatedObject.new(title: 'Mr.') }
+        it { is_expected.to be_valid }
+      end
+
+      context do
+        let(:object) { ValidatedObject.new }
+        it do
+          expect { subject.valid? }.not_to raise_error
+          expect(subject).not_to be_valid
+          expect(subject.errors.count).to eq(1)
+        end
+      end
+    end
+
+    context 'validation has message' do
+      before do
+        stub_class(:validated_object) do
+          include Granite::Form::Model::Validations
+          include Granite::Form::Model::Attributes
+          include Granite::Form::Model::Primary
+
+          primary :id
+          attribute :title, String
+          validates_presence_of :title, message: 'test message'
+        end
+      end
+
+      context do
+        let(:object) { ValidatedObject.new(title: 'Mr.') }
+        it { is_expected.to be_valid }
+      end
+
+      context do
+        let(:object) { ValidatedObject.new }
+        it do
+          expect { subject.valid? }.not_to raise_error
+          expect(subject).not_to be_valid
+          expect(subject.errors.count).to eq(1)
+        end
       end
     end
   end

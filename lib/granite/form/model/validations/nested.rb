@@ -19,7 +19,7 @@ module Granite
             def self.import_errors(from, to, prefix)
               from.each do |error|
                 key = "#{prefix}.#{error.attribute}"
-                to.import(error, attribute: key) unless to.added?(key, error.type, error.options)
+                to.import(error, attribute: key) unless to.messages_for(key).include?(error.message)
               end
             end
           else
