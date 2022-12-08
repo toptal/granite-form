@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'shared/nested_attribute_examples'
 
 describe Granite::Form::ActiveRecord::NestedAttributes do
   before do
