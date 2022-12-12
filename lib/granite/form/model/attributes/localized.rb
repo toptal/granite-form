@@ -5,7 +5,7 @@ module Granite
         class Localized < Attribute
           def read
             @value ||= Hash[read_before_type_cast.map do |locale, value|
-              [locale.to_s, normalize(enumerize(typecast(value)))]
+              [locale.to_s, normalize(enumerize(type_definition.ensure_type(value)))]
             end]
           end
 

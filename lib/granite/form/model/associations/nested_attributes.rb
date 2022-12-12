@@ -74,7 +74,7 @@ module Granite
               primary_attribute_name = primary_name_for(association.reflection.klass)
               if existing_record
                 primary_attribute = existing_record.attribute(primary_attribute_name)
-                primary_attribute_value = primary_attribute.typecast(attributes[primary_attribute_name]) if primary_attribute
+                primary_attribute_value = primary_attribute.type_definition.ensure_type(attributes[primary_attribute_name]) if primary_attribute
               end
 
               if existing_record && (!primary_attribute || options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
@@ -123,7 +123,7 @@ module Granite
                 else
                   existing_record = association.target.detect do |record|
                     primary_attribute_value = record.attribute(primary_attribute_name)
-                      .typecast(attributes[primary_attribute_name])
+                      .type_definition.ensure_type(attributes[primary_attribute_name])
                     record.primary_attribute == primary_attribute_value
                   end
                   if existing_record
@@ -162,7 +162,7 @@ module Granite
             end
 
             def self.destroy_flag?(hash)
-              Granite::Form.typecaster(Boolean).call(hash[DESTROY_ATTRIBUTE])
+              Types::Boolean.typecast(hash[DESTROY_ATTRIBUTE])
             end
 
             def self.reject_new_object?(object, association_name, attributes, options)

@@ -57,51 +57,6 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute(default: false, type: Boolean).defaultize(nil)).to eq(false) }
   end
 
-  describe '#typecast' do
-    context 'when Object' do
-      specify { expect(attribute.typecast(:hello)).to eq(:hello) }
-    end
-
-    context 'when Integer' do
-      specify { expect(attribute(type: Integer).typecast(42)).to eq(42) }
-      specify { expect(attribute(type: Integer).typecast('42')).to eq(42) }
-    end
-
-    context 'when Hash' do
-      let(:to_h) { {'x' => {'foo' => 'bar'}, 'y' => 2} }
-      let(:parameters) { ActionController::Parameters.new(to_h) }
-
-      before(:all) do
-        @default_hash_typecaster = Granite::Form.typecaster('Hash')
-        require 'action_controller'
-        Class.new(ActionController::Base)
-        @action_controller_hash_typecaster = Granite::Form.typecaster('Hash')
-      end
-
-      context 'when ActionController is loaded' do
-        before { Granite::Form.typecaster('Hash', &@action_controller_hash_typecaster) }
-        after { Granite::Form.typecaster('Hash', &@default_hash_typecaster) }
-
-        specify { expect(attribute(type: Hash).typecast(nil)).to be_nil }
-        specify { expect(attribute(type: Hash).typecast(to_h)).to eq(to_h) }
-        specify { expect(attribute(type: Hash).typecast(parameters)).to be_nil }
-        specify { expect(attribute(type: Hash).typecast(parameters.permit(:y, x: [:foo]))).to eq(to_h) }
-      end
-
-      context 'when ActionController is not loaded' do
-        before { Granite::Form.typecaster('Hash', &@default_hash_typecaster) }
-
-        specify { expect(attribute(type: Hash).typecast(nil)).to be_nil }
-        specify { expect(attribute(type: Hash).typecast(to_h)).to eq(to_h) }
-        if ActiveSupport.version > Gem::Version.new('4.3')
-          specify { expect(attribute(type: Hash).typecast(parameters.permit(:y, x: [:foo]))).to be_nil }
-        else
-          specify { expect(attribute(type: Hash).typecast(parameters.permit(:y, x: [:foo]))).to eq(to_h) }
-        end
-      end
-    end
-  end
-
   describe '#enum' do
     before { allow_any_instance_of(Dummy).to receive_messages(value: 1..5) }
 
@@ -144,7 +99,10 @@ describe Granite::Form::Model::Attributes::Attribute do
 
     context 'integration' do
       before do
-        allow(Granite::Form).to receive_messages(config: Granite::Form::Config.send(:new))
+        config = Granite::Form::Config.send(:new)
+        config.types.merge! Granite::Form.config.types
+        allow(Granite::Form).to receive_messages(config: config)
+
         Granite::Form.normalizer(:strip) { |value, _, _| value.strip }
         Granite::Form.normalizer(:trim) do |value, options, _attribute|
           value.first(length || options[:length] || 2)

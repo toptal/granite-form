@@ -43,10 +43,6 @@ module Granite
               end
             end
 
-            def typecaster
-              @typecaster ||= Granite::Form.typecaster(type.ancestors.grep(Class))
-            end
-
             def readonly
               @readonly ||= options[:readonly]
             end

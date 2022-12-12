@@ -54,7 +54,7 @@ describe Granite::Form::Model::Primary do
         include Granite::Form::Model::Primary
 
         primary_attribute type: Integer
-        attribute :name
+        attribute :name, Object
       end
     end
 

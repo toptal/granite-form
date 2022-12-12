@@ -5,7 +5,7 @@ module Granite
         class ReferenceMany < ReferenceOne
           def type_casted_value
             variable_cache(:value) do
-              read_before_type_cast.map { |id| typecast(id) }
+              read_before_type_cast.map { |id| type_definition.ensure_type(id) }
             end
           end
 

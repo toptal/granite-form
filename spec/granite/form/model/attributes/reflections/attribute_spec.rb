@@ -43,18 +43,6 @@ describe Granite::Form::Model::Attributes::Reflections::Attribute do
     specify { expect(reflection(default: -> {}).defaultizer).to be_a Proc }
   end
 
-  describe '#typecaster' do
-    before do
-      stub_class(:dummy, String)
-      stub_class(:dummy_dummy, Dummy)
-    end
-
-    specify { expect(reflection(type: Object).typecaster).to eq(Granite::Form.typecaster(Object)) }
-    specify { expect(reflection(type: String).typecaster).to eq(Granite::Form.typecaster(String)) }
-    specify { expect(reflection(type: Dummy).typecaster).to eq(Granite::Form.typecaster(String)) }
-    specify { expect(reflection(type: DummyDummy).typecaster).to eq(Granite::Form.typecaster(String)) }
-  end
-
   describe '#enumerizer' do
     specify { expect(reflection.enumerizer).to be_nil }
     specify { expect(reflection(enum: 42).enumerizer).to eq(42) }

@@ -4,7 +4,7 @@ module Granite
       include Singleton
 
       attr_accessor :include_root_in_json, :i18n_scope, :logger, :primary_attribute, :base_class, :base_concern,
-        :_normalizers, :_typecasters
+        :_normalizers, :types
 
       def self.delegated
         public_instance_methods - superclass.public_instance_methods - Singleton.public_instance_methods
@@ -16,7 +16,7 @@ module Granite
         @logger = Logger.new(STDERR)
         @primary_attribute = :id
         @_normalizers = {}
-        @_typecasters = {}
+        @types = {}
       end
 
       def normalizer(name, &block)
@@ -27,15 +27,15 @@ module Granite
         end
       end
 
-      def typecaster(*classes, &block)
-        classes = classes.flatten
-        if block
-          _typecasters[classes.first.to_s.camelize] = block
-        else
-          _typecasters[classes.detect do |klass|
-            _typecasters[klass.to_s.camelize]
-          end.to_s.camelize] or raise TypecasterMissing, classes
+      def typecaster(class_name, &block)
+        types[class_name.to_s.camelize] = Class.new(Types::Object) do
+          define_method(:typecast, &block)
         end
+      end
+
+      def type_for(klass)
+        key = klass.ancestors.grep(Class).map(&:to_s).find(&types) or raise TypecasterMissing, klass
+        types.fetch(key)
       end
     end
   end
