@@ -1,6 +1,7 @@
 # master
 
 ## Next
+## v0.2.0
 
 - Replace typecasters with proper type definitions.
   - Instead of `typecaster(type) { |value, _| ... }` you'll have to use `typecaster(type) { |value| ... }`.
