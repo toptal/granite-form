@@ -16,10 +16,6 @@ module Granite
               raise NotImplementedError, 'Should be implemented in inhereted adapter. Build new instance of data object by attributes'
             end
 
-            def persist(_object, *)
-              raise NotImplementedError, 'Should be implemented in inhereted adapter. Build new instance of data object by attributes'
-            end
-
             def scope(_owner, _source)
               raise NotImplementedError, 'Should be implemented in inhereted adapter. Better to be Enumerable'
             end

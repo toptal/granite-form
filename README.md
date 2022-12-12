@@ -384,8 +384,6 @@ Options:
 * `:validate` - true or false
 * `:default` - default value for association: reference collection or objects themselves
 
-#### Interacting with ActiveRecord
-
 ### Persistence Adapters
 
 Adapter definition syntax:

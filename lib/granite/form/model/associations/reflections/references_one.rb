@@ -7,8 +7,6 @@ module Granite
       module Associations
         module Reflections
           class ReferencesOne < ReferencesAny
-            include Singular
-
             def self.build(target, generated_methods, name, *args, &block)
               reflection = super
 
