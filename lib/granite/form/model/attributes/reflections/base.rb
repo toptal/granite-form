@@ -7,11 +7,9 @@ module Granite
             attr_reader :name, :options
 
             class << self
-              def build(_target, _generated_methods, name, *args, &block)
-                options = args.extract_options!
-                options[:type] = args.first if args.first
-                options[:default] = block if block
-                new(name, options)
+              def build(_target, generated_methods, name, *args, &block)
+                generate_methods name, generated_methods
+                new(name, *args, &block)
               end
 
               def generate_methods(name, target) end
@@ -21,9 +19,12 @@ module Granite
               end
             end
 
-            def initialize(name, options = {})
+            def initialize(name, *args, &block)
               @name = name.to_s
-              @options = options
+
+              @options = args.extract_options!
+              @options[:type] = args.first if args.first
+              @options[:default] = block if block
             end
 
             def build_attribute(owner, raw_value = Granite::Form::UNDEFINED)
