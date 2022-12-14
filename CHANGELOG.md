@@ -1,6 +1,9 @@
 # master
 
 ## Next
+
+- [BREAKING] Stop automatically saving `references_one`/`references_many` when applying changes.
+
 ## v0.2.0
 
 - Replace typecasters with proper type definitions.

@@ -26,10 +26,6 @@ module Granite
               data_source.new(attributes)
             end
 
-            def persist(object, raise_error: false)
-              raise_error ? object.save! : object.save
-            end
-
             def scope(owner, source)
               scope = data_source.unscoped
 

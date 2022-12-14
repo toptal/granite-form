@@ -41,6 +41,10 @@ module Granite
             target
           end
 
+          def apply_changes
+            true
+          end
+
           def apply_changes!
             apply_changes or raise Granite::Form::AssociationChangesNotApplied
           end

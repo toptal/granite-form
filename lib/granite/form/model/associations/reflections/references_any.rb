@@ -53,10 +53,6 @@ module Granite
             def inspect
               "#{self.class.name.demodulize}(#{persistence_adapter.data_type})"
             end
-
-            def autosave?
-              !!options[:autosave]
-            end
           end
         end
       end

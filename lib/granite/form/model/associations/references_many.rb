@@ -3,38 +3,6 @@ module Granite
     module Model
       module Associations
         class ReferencesMany < ReferencesAny
-          def build(attributes = {})
-            append([build_object(attributes)]).last
-          end
-
-          def create(attributes = {})
-            object = build(attributes)
-            persist_object(object)
-            object
-          end
-
-          def create!(attributes = {})
-            object = build(attributes)
-            persist_object(object, raise_error: true)
-            object
-          end
-
-          def apply_changes
-            target.all? do |object|
-              if object
-                if object.marked_for_destruction? && reflection.autosave?
-                  object.destroy
-                elsif object.new_record? || (reflection.autosave? && object.changed?)
-                  persist_object(object)
-                else
-                  true
-                end
-              else
-                true
-              end
-            end
-          end
-
           def target=(object)
             loaded!
             @target = object.to_a
