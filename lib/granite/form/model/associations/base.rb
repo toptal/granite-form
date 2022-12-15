@@ -41,14 +41,6 @@ module Granite
             target
           end
 
-          def apply_changes
-            true
-          end
-
-          def apply_changes!
-            apply_changes or raise Granite::Form::AssociationChangesNotApplied
-          end
-
           def callback(name, object)
             evaluator = reflection.options[name]
             return true unless evaluator

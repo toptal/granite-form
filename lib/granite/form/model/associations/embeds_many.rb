@@ -7,27 +7,6 @@ module Granite
             push_object(build_object(attributes))
           end
 
-          def create(attributes = {})
-            build(attributes).tap(&:save)
-          end
-
-          def create!(attributes = {})
-            build(attributes).tap(&:save!)
-          end
-
-          def destroyed
-            @destroyed ||= []
-          end
-
-          def apply_changes
-            result = target.map do |object|
-              object.destroyed? || object.marked_for_destruction? ? object.destroy : object.save
-            end.all?
-            @destroyed = target.select(&:destroyed?)
-            target.delete_if(&:destroyed?)
-            result
-          end
-
           def target=(objects)
             objects.each { |object| setup_performers! object }
             loaded!
@@ -63,13 +42,14 @@ module Granite
             @target = []
           end
 
+          def sync
+            write_source(target.map { |model| model_data(model) })
+          end
+
           def clear
-            begin
-              transaction { target.all?(&:destroy!) }
-            rescue Granite::Form::ObjectNotDestroyed
-              nil
-            end
-            reload.empty?
+            target
+            @target = []
+            true
           end
 
           def reader(force_reload = false)
@@ -80,7 +60,7 @@ module Granite
           def replace(objects)
             transaction do
               clear
-              append(objects) or raise Granite::Form::AssociationChangesNotApplied
+              append(objects)
             end
           end
 
@@ -101,8 +81,7 @@ module Granite
               raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object && object.is_a?(reflection.klass)
               push_object object
             end
-            result = owner.persisted? ? apply_changes : true
-            result && target
+            target
           end
 
           def push_object(object)
@@ -114,34 +93,6 @@ module Granite
           def setup_performers!(object)
             embed_object(object)
             callback(:before_add, object)
-
-            association = self
-
-            object.define_create do
-              source = association.send(:read_source)
-              index = association.target
-                .select { |one| one.persisted? || one.equal?(self) }
-                .index { |one| one.equal?(self) }
-
-              source.insert(index, attributes)
-              association.send(:write_source, source)
-            end
-
-            object.define_update do
-              source = association.send(:read_source)
-              index = association.target.select(&:persisted?).index { |one| one.equal?(self) }
-
-              source[index] = attributes
-              association.send(:write_source, source)
-            end
-
-            object.define_destroy do
-              source = association.send(:read_source)
-              index = association.target.select(&:persisted?).index { |one| one.equal?(self) }
-
-              source.delete_at(index) if index
-              association.send(:write_source, source)
-            end
 
             callback(:after_add, object)
           end

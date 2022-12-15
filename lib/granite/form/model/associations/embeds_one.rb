@@ -3,31 +3,8 @@ module Granite
     module Model
       module Associations
         class EmbedsOne < EmbedsAny
-          attr_reader :destroyed
-
           def build(attributes = {})
             self.target = build_object(attributes)
-          end
-
-          def create(attributes = {})
-            build(attributes).tap(&:save)
-          end
-
-          def create!(attributes = {})
-            build(attributes).tap(&:save!)
-          end
-
-          def apply_changes
-            if target
-              if target.destroyed? || target.marked_for_destruction?
-                @destroyed = target
-                clear
-              else
-                target.save
-              end
-            else
-              true
-            end
           end
 
           def target=(object)
@@ -63,9 +40,14 @@ module Granite
             object
           end
 
+          def sync
+            write_source(model_data(target))
+          end
+
           def clear
-            target.try(:destroy)
-            reload.nil?
+            target
+            @target = nil
+            true
           end
 
           def reader(force_reload = false)
@@ -79,7 +61,6 @@ module Granite
               transaction do
                 clear
                 self.target = object
-                apply_changes! if owner.persisted?
               end
             else
               clear
@@ -94,16 +75,6 @@ module Granite
 
           def setup_performers!(object)
             embed_object(object)
-            association = self
-
-            object.define_save do
-              association.send(:write_source, attributes)
-            end
-
-            object.define_destroy do
-              association.send(:write_source, nil)
-              true
-            end
           end
         end
       end

@@ -12,6 +12,13 @@ module Granite
           def embed_object(object)
             object.instance_variable_set(:@embedder, owner)
           end
+
+          def model_data(model)
+            return unless model
+
+            model.association_names.each { |assoc_name| model.association(assoc_name).sync }
+            model.attributes
+          end
         end
       end
     end

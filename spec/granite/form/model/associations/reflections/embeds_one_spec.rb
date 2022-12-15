@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
   before do
     stub_model(:author) do
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
+      include Granite::Form::Model::Associations
       attribute :name, String
     end
 
@@ -27,22 +28,26 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
         attribute :title
         embeds_one :author,
           read: lambda { |reflection, object|
-            value = object.read_attribute(reflection.name)
+            value = object.instance_variable_get("@_value_#{reflection.name}")
             JSON.parse(value) if value.present?
           },
           write: lambda { |reflection, object, value|
-            object.write_attribute(reflection.name, value ? value.to_json : nil)
+            value = value.to_json if value
+            object.instance_variable_set("@_value_#{reflection.name}", value)
           }
       end
     end
 
-    let(:book) { Book.instantiate author: {name: 'Duke'}.to_json }
+    let(:book) { Book.new }
     let(:author) { Author.new(name: 'Rick') }
 
     specify do
-      expect { book.author = author }
-        .to change { book.read_attribute(:author) }
-        .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json)
+      expect do
+        book.author = author
+        book.association(:author).sync
+      end
+        .to change { book.author(true) }
+        .from(nil).to(have_attributes(name: 'Rick'))
     end
   end
 
@@ -65,18 +70,6 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
     specify { expect { book.build_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
   end
 
-  describe '#create_author' do
-    let(:author) { Author.new name: 'Author' }
-    specify { expect(book.create_author(name: 'Author')).to eq(author) }
-    specify { expect { book.create_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
-  end
-
-  describe '#create_author!' do
-    let(:author) { Author.new name: 'Author' }
-    specify { expect(book.create_author!(name: 'Author')).to eq(author) }
-    specify { expect { book.create_author!(name: 'Author') }.to change { book.author }.from(nil).to(author) }
-  end
-
   context 'on the fly' do
     context do
       before do
@@ -92,8 +85,8 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
 
       specify { expect(Book.reflect_on_association(:author).klass).to eq(Book::Author) }
       specify { expect(Book.new.author).to be_nil }
-      specify { expect(Book.new.tap { |b| b.create_author(name: 'Author') }.author).to be_a(Book::Author) }
-      specify { expect(Book.new.tap { |b| b.create_author(name: 'Author') }.read_attribute(:author)).to eq('name' => 'Author') }
+      specify { expect(Book.new.tap { |b| b.build_author(name: 'Author') }.author).to be_a(Book::Author) }
+      specify { expect(Book.new.tap { |b| b.build_author(name: 'Author') }.author).to have_attributes(name: 'Author') }
     end
 
     context do
@@ -110,8 +103,8 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
 
       specify { expect(Book.reflect_on_association(:author).klass).to eq(Book::Author) }
       specify { expect(Book.new.author).to be_nil }
-      specify { expect(Book.new.tap { |b| b.create_author(name: 'Author') }.author).to be_a(Book::Author) }
-      specify { expect(Book.new.tap { |b| b.create_author(name: 'Author') }.read_attribute(:author)).to eq('name' => 'Author', 'age' => nil) }
+      specify { expect(Book.new.tap { |b| b.build_author(name: 'Author') }.author).to be_a(Book::Author) }
+      specify { expect(Book.new.tap { |b| b.build_author(name: 'Author') }.author).to have_attributes(name: 'Author', age: nil) }
     end
   end
 end

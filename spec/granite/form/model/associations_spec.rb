@@ -7,7 +7,7 @@ describe Granite::Form::Model::Associations do
         include Granite::Form::Model::Associations
       end
       stub_model(:project) do
-        include Granite::Form::Model::Lifecycle
+        include Granite::Form::Model::Persistence
       end
       stub_model(:user, Nobody) do
         include Granite::Form::Model::Associations
@@ -65,7 +65,7 @@ describe Granite::Form::Model::Associations do
   context do
     before do
       stub_model(:project) do
-        include Granite::Form::Model::Lifecycle
+        include Granite::Form::Model::Persistence
         include Granite::Form::Model::Associations
 
         attribute :title, String
@@ -80,7 +80,7 @@ describe Granite::Form::Model::Associations do
       end
 
       stub_model(:profile) do
-        include Granite::Form::Model::Lifecycle
+        include Granite::Form::Model::Persistence
 
         attribute :first_name, String
         attribute :last_name, String
@@ -158,27 +158,6 @@ describe Granite::Form::Model::Associations do
 
     describe '#association_names' do
       specify { expect(user.association_names).to eq(%i[profile projects]) }
-    end
-
-    describe '#apply_association_changes!' do
-      let(:profile) { Profile.new first_name: 'Name' }
-      let(:project) { Project.new title: 'Project' }
-      let(:user) { User.new(profile: profile, projects: [project]) }
-      before { project.build_author(name: 'Author') }
-
-      specify do
-        expect { user.apply_association_changes! }.to change { user.attributes['profile'] }
-          .from(nil).to('first_name' => 'Name', 'last_name' => nil)
-      end
-      specify do
-        expect { user.apply_association_changes! }.to change { user.attributes['projects'] }
-          .from(nil).to([{'title' => 'Project', 'author' => {'name' => 'Author'}}])
-      end
-
-      context do
-        let(:project) { Project.new }
-        specify { expect { user.apply_association_changes! }.to raise_error Granite::Form::AssociationChangesNotApplied }
-      end
     end
 
     describe '#instantiate' do

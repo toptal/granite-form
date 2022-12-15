@@ -14,14 +14,6 @@ module Granite
                 def build_#{name} attributes = {}
                   association(:#{name}).build(attributes)
                 end
-
-                def create_#{name} attributes = {}
-                  association(:#{name}).create(attributes)
-                end
-
-                def create_#{name}! attributes = {}
-                  association(:#{name}).create!(attributes)
-                end
                 RUBY
               end
             end

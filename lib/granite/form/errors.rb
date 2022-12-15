@@ -17,21 +17,6 @@ module Granite
       end
     end
 
-    class UnsavableObject < Error
-    end
-
-    class UndestroyableObject < Error
-    end
-
-    class ObjectNotSaved < Error
-    end
-
-    class ObjectNotDestroyed < Error
-    end
-
-    class AssociationChangesNotApplied < Error
-    end
-
     class AssociationTypeMismatch < Error
       def initialize(expected, got)
         super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"

@@ -4,7 +4,7 @@ shared_examples 'nested attributes' do
   before do
     stub_model :project do
       include Granite::Form::Model::Primary
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Associations
 
       primary :slug, String
       attribute :title, String
@@ -12,7 +12,7 @@ shared_examples 'nested attributes' do
 
     stub_model :profile do
       include Granite::Form::Model::Primary
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Associations
 
       primary :identifier
       attribute :first_name, String
@@ -49,14 +49,12 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.profile_attributes = {first_name: 'User 1', _destroy: '1'}
-          user.save { true }
         end.not_to change { user.profile.first_name }
       end
       specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'} }.to change { user.profile.first_name }.to('User 1') }
       specify do
         expect do
           user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'}
-          user.save { true }
         end.to change { user.profile.first_name }.to('User 1')
       end
 
@@ -67,14 +65,12 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.profile_attributes = {first_name: 'User 1', _destroy: '1'}
-            user.save { true }
           end.not_to change { user.profile.first_name }
         end
-        specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'} }.to change { user.profile.first_name }.to('User 1') }
+        specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'} }.to change { user.profile }.to(nil) }
         specify do
           expect do
             user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'}
-            user.save { true }
           end.to change { user.profile }.to(nil)
         end
       end
@@ -92,8 +88,6 @@ shared_examples 'nested attributes' do
     context 'not primary' do
       before do
         stub_model :profile do
-          include Granite::Form::Model::Lifecycle
-
           attribute :identifier, Integer
           attribute :first_name, String
         end
@@ -245,7 +239,6 @@ shared_examples 'nested attributes' do
             {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
             {title: 'Project 4', _destroy: '1'}
           ]
-          user.save { true }
         end
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
       end
@@ -259,16 +252,6 @@ shared_examples 'nested attributes' do
               {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
               {title: 'Project 4', _destroy: '1'}
             ]
-          end
-            .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
-        end
-        specify do
-          expect do
-            user.projects_attributes = [
-              {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
-              {title: 'Project 4', _destroy: '1'}
-            ]
-            user.save { true }
           end
             .to change { user.projects.map(&:title) }.to(['Project 2'])
         end
@@ -303,7 +286,6 @@ shared_examples 'nested attributes' do
       before do
         stub_model :project do
           include Granite::Form::Model::Primary
-          include Granite::Form::Model::Lifecycle
 
           attribute :slug, String
           attribute :title, String

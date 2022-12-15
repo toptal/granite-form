@@ -7,7 +7,6 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsAny do
 
     before do
       stub_model(:project) do
-        include Granite::Form::Model::Lifecycle
         attribute :title, String
       end
       stub_model(:user) do
@@ -20,7 +19,7 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsAny do
 
     it { is_expected.to be_a(Granite::Form::Model) }
     it { is_expected.to be_a(Granite::Form::Model::Primary) }
-    it { is_expected.to be_a(Granite::Form::Model::Lifecycle) }
+    it { is_expected.to be_a(Granite::Form::Model::Persistence) }
     it { is_expected.to be_a(Granite::Form::Model::Associations) }
 
     context 'when Granite::Form.base_concern is defined' do

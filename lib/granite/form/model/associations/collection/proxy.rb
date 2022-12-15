@@ -6,7 +6,7 @@ module Granite
           class Proxy
             include Enumerable
 
-            delegate :target, :save, :save!, :loaded?, :reload, :clear, :concat, to: :@association
+            delegate :target, :loaded?, :reload, :clear, :concat, to: :@association
             delegate :each, :size, :length, :first, :last, :empty?, :many?, :==, :dup, to: :target
             alias_method :<<, :concat
             alias_method :push, :concat

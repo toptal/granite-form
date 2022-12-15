@@ -22,7 +22,7 @@ module Granite
                 Class.new(superclass || Granite::Form.base_class) do
                   include Granite::Form::Model
                   include Granite::Form::Model::Associations
-                  include Granite::Form::Model::Lifecycle
+                  include Granite::Form::Model::Persistence
                   include Granite::Form::Model::Primary
                   include Granite::Form.base_concern if Granite::Form.base_concern
                 end

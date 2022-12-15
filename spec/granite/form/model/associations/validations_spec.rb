@@ -3,7 +3,6 @@ require 'spec_helper'
 describe Granite::Form::Model::Associations::Validations do
   before do
     stub_model(:project) do
-      include Granite::Form::Model::Lifecycle
       include Granite::Form::Model::Associations
       include Granite::Form::Model::Associations::Validations
 
@@ -17,8 +16,6 @@ describe Granite::Form::Model::Associations::Validations do
     end
 
     stub_model(:profile) do
-      include Granite::Form::Model::Lifecycle
-
       attribute :first_name, String
       attribute :last_name, String
       validates :first_name, presence: true
