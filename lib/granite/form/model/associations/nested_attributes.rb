@@ -78,7 +78,7 @@ module Granite
               end
 
               if existing_record && (!primary_attribute || options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
-                assign_to_or_mark_for_destruction(existing_record, attributes) unless call_reject_if(object, association_name, attributes)
+                assign_to(existing_record, attributes) unless call_reject_if(object, association_name, attributes)
                 association.clear if destroy_flag?(attributes) && options[:allow_destroy]
               elsif attributes[primary_attribute_name].present?
                 raise Granite::Form::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
@@ -128,7 +128,7 @@ module Granite
                     record.primary_attribute == primary_attribute_value
                   end
                   if existing_record
-                    assign_to_or_mark_for_destruction(existing_record, attributes) unless call_reject_if(object, association_name, attributes)
+                    assign_to(existing_record, attributes) unless call_reject_if(object, association_name, attributes)
                     association.target.delete(existing_record) if destroy_flag?(attributes) && options[:allow_destroy]
                   elsif association.reflection.embedded?
                     unless reject_new_object?(object, association_name, attributes, options)
@@ -158,7 +158,7 @@ module Granite
               raise Granite::Form::TooManyObjects.new(limit, attributes_collection.size)
             end
 
-            def self.assign_to_or_mark_for_destruction(object, attributes)
+            def self.assign_to(object, attributes)
               object.assign_attributes(attributes.except(*unassignable_keys(object)))
             end
 
