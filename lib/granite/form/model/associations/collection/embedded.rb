@@ -4,7 +4,8 @@ module Granite
       module Associations
         module Collection
           class Embedded < Proxy
-            delegate :build, :create, :create!, to: :@association
+            delegate :build, to: :@association
+            delegate :delete, to: :target
             alias_method :new, :build
           end
         end

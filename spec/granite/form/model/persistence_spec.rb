@@ -11,12 +11,10 @@ describe Granite::Form::Model::Persistence do
   end
 
   specify { expect(model.new).not_to be_persisted }
-  specify { expect(model.new).not_to be_destroyed }
 
   describe '#instantiate' do
     specify { expect(model.instantiate({})).to be_an_instance_of model }
     specify { expect(model.instantiate({})).to be_persisted }
-    specify { expect(model.instantiate({})).not_to be_destroyed }
 
     context do
       subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }

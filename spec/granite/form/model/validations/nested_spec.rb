@@ -3,8 +3,7 @@ require 'spec_helper'
 describe Granite::Form::Model::Validations::NestedValidator do
   before do
     stub_model(:validated_assoc) do
-      include Granite::Form::Model
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
       include Granite::Form::Model::Primary
 
       primary :id, Integer
@@ -14,8 +13,7 @@ describe Granite::Form::Model::Validations::NestedValidator do
     end
 
     stub_model(:unvalidated_assoc) do
-      include Granite::Form::Model
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
 
       attribute :name, String
     end

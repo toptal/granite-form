@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Granite::Form::ActiveRecord::Associations do
   before do
     stub_model(:project) do
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
       include Granite::Form::Model::Associations
 
       attribute :title, String
@@ -18,7 +18,8 @@ describe Granite::Form::ActiveRecord::Associations do
     end
 
     stub_model(:profile) do
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
+      include Granite::Form::Model::Associations
 
       attribute :first_name, String
       attribute :last_name, String
@@ -89,7 +90,10 @@ describe Granite::Form::ActiveRecord::Associations do
       end
 
       context 'with profile already set' do
-        before { user.create_profile(admin: true) }
+        before do
+          user.build_profile(admin: true)
+          user.save!
+        end
 
         specify do
           user.profile.admin = false
@@ -105,12 +109,8 @@ describe Granite::Form::ActiveRecord::Associations do
 
     describe '#projects' do
       specify do
-        expect { user.projects << Project.new }
-          .not_to change { user.read_attribute(:projects) }
-      end
-      specify do
         expect { user.projects << Project.new(title: 'First') }
-          .to change { user.projects.reload.count }.from(0).to(1)
+          .not_to change { user.read_attribute(:projects) }
       end
       specify do
         user.projects << Project.new(title: 'First')
@@ -124,15 +124,14 @@ describe Granite::Form::ActiveRecord::Associations do
 
         specify do
           expect { user.projects << project }
-            .to change { user.read_attribute(:projects) }.from(nil)
-            .to([{'title' => 'First', 'author' => {'name' => 'Author'}}])
+            .not_to change { user.read_attribute(:projects) }
         end
         specify do
           expect do
             user.projects << project
             user.save
           end
-            .to change { user.reload.read_attribute(:projects) }.from(nil)
+            .to change { user.reload.read_attribute(:projects) }.from([])
             .to([{'title' => 'First', 'author' => {'name' => 'Author'}}])
         end
       end
@@ -150,8 +149,7 @@ describe Granite::Form::ActiveRecord::Associations do
       end
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
-          .to change { user.read_attribute(:profile) }.from(nil)
-          .to({first_name: 'google.com', last_name: nil, admin: nil}.to_json)
+          .not_to change { user.read_attribute(:profile) }
       end
       specify do
         expect do
@@ -196,16 +194,16 @@ describe Granite::Form::ActiveRecord::Associations do
 
     specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
     specify { expect(User.new.projects).to eq([]) }
-    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{title: 'Project'}].to_json) }
+    specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
+    specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project')]) }
 
     specify { expect(User.reflect_on_association(:profile).klass).to eq(User::Profile) }
     specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
     specify { expect(User.new.profile).to be_nil }
-    specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
+    specify { expect(User.new.tap { |u| u.build_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
     specify do
-      expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile))
-        .to eq({first_name: 'Profile', last_name: nil, admin: nil, age: nil}.to_json)
+      expect(User.new.tap { |u| u.build_profile(first_name: 'Profile') }.profile)
+        .to have_attributes(first_name: 'Profile', last_name: nil, admin: nil, age: nil)
     end
   end
 end

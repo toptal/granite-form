@@ -30,7 +30,7 @@ describe Granite::Form::Model::Dirty do
   let(:other_author) { Author.create!(name: 'Other') }
 
   specify { expect(Model.new.changes).to eq({}) }
-  specify { expect(Model.new.tap { |m| m.create_something(value: 'Value') }.changes).to eq({}) }
+  specify { expect(Model.new.tap { |m| m.build_something(value: 'Value') }.changes).to eq({}) }
 
   specify { expect(Model.new(author: author).changes).to eq('author_id' => [nil, author.id]) }
   specify { expect(Model.new(author_id: author.id).changes).to eq('author_id' => [nil, author.id]) }

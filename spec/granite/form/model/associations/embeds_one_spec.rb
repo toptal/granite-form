@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Granite::Form::Model::Associations::EmbedsOne do
   before do
     stub_model(:author) do
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
+      include Granite::Form::Model::Associations
 
       attribute :name, String
       validates :name, presence: true
@@ -62,12 +63,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     end
 
     specify do
-      expect { association.create(name: 'Author1') }
-        .to change { book.callbacks }
-        .to([[:before_add, author1], [:after_add, author1]])
-    end
-
-    specify do
       expect { association.writer(author1) }
         .to change { book.callbacks }
         .to([[:before_add, author1], [:after_add, author1]])
@@ -118,7 +113,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     let(:author) { Author.new(name: 'Author') }
 
     specify { expect(association.build.embedder).to eq(book) }
-    specify { expect(association.create.embedder).to eq(book) }
     specify do
       expect { association.writer(author) }
         .to change { author.embedder }.from(nil).to(book)
@@ -156,7 +150,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       end
 
       specify { expect(association.build(name: 'Author').name).to eq('AuthorBook') }
-      specify { expect(association.create(name: 'Author').name).to eq('AuthorBook') }
     end
   end
 
@@ -172,132 +165,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     specify do
       expect { existing_association.build(name: 'Fred') }
         .not_to change { existing_book.read_attribute(:author) }
-    end
-  end
-
-  describe '#create' do
-    specify { expect(association.create).to be_a Author }
-    specify { expect(association.create).not_to be_persisted }
-
-    specify { expect(association.create(name: 'Fred')).to be_a Author }
-    specify { expect(association.create(name: 'Fred')).to be_persisted }
-
-    specify do
-      expect { association.create }
-        .not_to change { book.read_attribute(:author) }
-    end
-    specify do
-      expect { association.create(name: 'Fred') }
-        .to change { book.read_attribute(:author) }
-        .from(nil).to('name' => 'Fred')
-    end
-
-    specify do
-      expect { existing_association.create }
-        .not_to change { existing_book.read_attribute(:author) }
-    end
-    specify do
-      expect { existing_association.create(name: 'Fred') }
-        .to change { existing_book.read_attribute(:author) }
-        .from('name' => 'Johny').to('name' => 'Fred')
-    end
-  end
-
-  describe '#create!' do
-    specify { expect { association.create! }.to raise_error Granite::Form::ValidationError }
-    specify do
-      expect { muffle(Granite::Form::ValidationError) { association.create! } }
-        .to change { association.target }
-        .from(nil).to(an_instance_of(Author))
-    end
-
-    specify { expect(association.create!(name: 'Fred')).to be_a Author }
-    specify { expect(association.create!(name: 'Fred')).to be_persisted }
-
-    specify do
-      expect { muffle(Granite::Form::ValidationError) { association.create! } }
-        .not_to change { book.read_attribute(:author) }
-    end
-    specify do
-      expect { muffle(Granite::Form::ValidationError) { association.create! } }
-        .to change { association.reader.try(:attributes) }
-        .from(nil).to('name' => nil)
-    end
-    specify do
-      expect { association.create(name: 'Fred') }
-        .to change { book.read_attribute(:author) }
-        .from(nil).to('name' => 'Fred')
-    end
-
-    specify do
-      expect { muffle(Granite::Form::ValidationError) { existing_association.create! } }
-        .not_to change { existing_book.read_attribute(:author) }
-    end
-    specify do
-      expect { muffle(Granite::Form::ValidationError) { existing_association.create! } }
-        .to change { existing_association.reader.try(:attributes) }
-        .from('name' => 'Johny').to('name' => nil)
-    end
-    specify do
-      expect { existing_association.create!(name: 'Fred') }
-        .to change { existing_book.read_attribute(:author) }
-        .from('name' => 'Johny').to('name' => 'Fred')
-    end
-  end
-
-  describe '#apply_changes' do
-    specify do
-      association.build
-      expect { association.apply_changes }
-        .not_to change { association.target.persisted? }.from(false)
-    end
-    specify do
-      association.build(name: 'Fred')
-      expect { association.apply_changes }
-        .to change { association.target.persisted? }.to(true)
-    end
-    specify do
-      existing_association.target.mark_for_destruction
-      expect { existing_association.apply_changes }
-        .to change { existing_association.target }.to(nil)
-    end
-    specify do
-      existing_association.target.destroy!
-      expect { existing_association.apply_changes }
-        .to change { existing_association.target }.to(nil)
-    end
-    specify do
-      existing_association.target.mark_for_destruction
-      expect { existing_association.apply_changes }
-        .to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
-    end
-    specify do
-      existing_association.target.destroy!
-      expect { existing_association.apply_changes }
-        .to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
-    end
-  end
-
-  describe '#apply_changes!' do
-    specify do
-      association.build
-      expect { association.apply_changes! }
-        .to raise_error Granite::Form::AssociationChangesNotApplied
-    end
-    specify do
-      association.build(name: 'Fred')
-      expect { association.apply_changes! }
-        .to change { association.target.persisted? }.to(true)
-    end
-    specify do
-      existing_association.target.mark_for_destruction
-      expect { existing_association.apply_changes! }
-        .to change { existing_association.target }.to(nil)
-    end
-    specify do
-      existing_association.target.destroy!
-      expect { existing_association.apply_changes! }
-        .to change { existing_association.target }.to(nil)
     end
   end
 
@@ -369,6 +236,31 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     end
   end
 
+  describe '#sync' do
+    let!(:author) { association.build(name: 'Fred') }
+
+    specify { expect { association.sync }.to change { book.read_attribute(:author) }.from(nil).to('name' => 'Fred') }
+
+    context 'when embedding is nested' do
+      before do
+        Author.class_eval do
+          include Granite::Form::Model::Associations
+
+          embeds_many :reviews do
+            attribute :rating, Integer
+          end
+        end
+
+        author.reviews.build(rating: 7)
+      end
+
+      specify do
+        expect { association.sync }.to change { book.read_attribute(:author) }
+          .from(nil).to('name' => 'Fred', 'reviews' => [{'rating' => 7}])
+      end
+    end
+  end
+
   describe '#clear' do
     specify { expect(association.clear).to eq(true) }
     specify { expect { association.clear }.not_to change { association.reader } }
@@ -377,28 +269,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     specify do
       expect { existing_association.clear }
         .to change { existing_association.reader.try(:attributes) }.from('name' => 'Johny').to(nil)
-    end
-    specify do
-      expect { existing_association.clear }
-        .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil)
-    end
-
-    context do
-      before { Author.send(:include, Granite::Form::Model::Callbacks) }
-      if ActiveModel.version >= Gem::Version.new('5.0.0')
-        before { Author.before_destroy { throw :abort } }
-      else
-        before { Author.before_destroy { false } }
-      end
-      specify { expect(existing_association.clear).to eq(false) }
-      specify do
-        expect { existing_association.clear }
-          .not_to change { existing_association.reader }
-      end
-      specify do
-        expect { existing_association.clear }
-          .not_to change { existing_book.read_attribute(:author).symbolize_keys }
-      end
     end
   end
 
@@ -441,23 +311,6 @@ describe Granite::Form::Model::Associations::EmbedsOne do
         expect { association.writer(new_author) }
           .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty')
       end
-      specify do
-        expect { association.writer(new_author) }
-          .to change { book.read_attribute(:author) }.from(nil).to('name' => 'Morty')
-      end
-
-      specify do
-        expect { association.writer(invalid_author) }
-          .to raise_error Granite::Form::AssociationChangesNotApplied
-      end
-      specify do
-        expect { muffle(Granite::Form::AssociationChangesNotApplied) { association.writer(invalid_author) } }
-          .not_to change { association.reader }
-      end
-      specify do
-        expect { muffle(Granite::Form::AssociationChangesNotApplied) { association.writer(invalid_author) } }
-          .not_to change { book.read_attribute(:author) }
-      end
     end
 
     context 'persisted owner' do
@@ -469,31 +322,15 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }
       specify do
-        expect { association.writer(nil) }
-          .not_to change { book.read_attribute(:author) }
-      end
-      specify do
         expect { association.writer(new_author) }
           .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty')
-      end
-      specify do
-        expect { association.writer(new_author) }
-          .not_to change { book.read_attribute(:author) }
       end
 
       specify do
         expect { association.writer(invalid_author) }
           .to change { association.reader.try(:attributes) }.from(nil).to('name' => nil)
       end
-      specify do
-        expect { association.writer(invalid_author) }
-          .not_to change { book.read_attribute(:author) }
-      end
 
-      specify do
-        expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer(stub_model(:dummy).new) } }
-          .not_to change { existing_book.read_attribute(:author) }
-      end
       specify do
         expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer(stub_model(:dummy).new) } }
           .not_to change { existing_association.reader }
@@ -502,31 +339,9 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       specify { expect(existing_association.writer(nil)).to be_nil }
       specify { expect(existing_association.writer(new_author)).to eq(new_author) }
       specify do
-        expect { existing_association.writer(nil) }
-          .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil)
-      end
-      specify do
         expect { existing_association.writer(new_author) }
           .to change { existing_association.reader.try(:attributes) }
           .from('name' => 'Johny').to('name' => 'Morty')
-      end
-      specify do
-        expect { existing_association.writer(new_author) }
-          .to change { existing_book.read_attribute(:author) }
-          .from('name' => 'Johny').to('name' => 'Morty')
-      end
-
-      specify do
-        expect { existing_association.writer(invalid_author) }
-          .to raise_error Granite::Form::AssociationChangesNotApplied
-      end
-      specify do
-        expect { muffle(Granite::Form::AssociationChangesNotApplied) { existing_association.writer(invalid_author) } }
-          .not_to change { existing_association.reader }
-      end
-      specify do
-        expect { muffle(Granite::Form::AssociationChangesNotApplied) { existing_association.writer(invalid_author) } }
-          .not_to change { existing_book.read_attribute(:author) }
       end
     end
   end

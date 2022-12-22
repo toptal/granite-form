@@ -100,12 +100,6 @@ module Granite
           (@_associations ||= {})[reflection.name] ||= reflection.build_association(self)
         end
 
-        def apply_association_changes!
-          association_names.all? do |name|
-            association(name).apply_changes!
-          end
-        end
-
       private
 
         def attributes_for_inspect

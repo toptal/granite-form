@@ -45,7 +45,7 @@ module Granite
               before_save callback_name
               class_eval <<-METHOD, __FILE__, __LINE__ + 1
               def #{callback_name}
-                association(:#{reflection.name}).apply_changes!
+                association(:#{reflection.name}).sync
               end
               METHOD
             end

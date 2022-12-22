@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
   before do
     stub_model(:project) do
-      include Granite::Form::Model::Lifecycle
+      include Granite::Form::Model::Persistence
+      include Granite::Form::Model::Associations
       attribute :title, String
     end
     stub_model(:user) do
@@ -24,24 +25,28 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
         attribute :name
         embeds_many :projects,
           read: lambda { |reflection, object|
-            value = object.read_attribute(reflection.name)
+            value = object.instance_variable_get("@_value_#{reflection.name}")
             JSON.parse(value) if value.present?
           },
           write: lambda { |reflection, object, value|
-            object.write_attribute(reflection.name, value.to_json)
+            value = value.to_json if value
+            object.instance_variable_set("@_value_#{reflection.name}", value)
           }
       end
     end
 
-    let(:user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}].to_json }
+    let(:user) { User.new }
     let(:new_project1) { Project.new(title: 'Project 1') }
     let(:new_project2) { Project.new(title: 'Project 2') }
 
     specify do
-      expect { user.projects.concat([new_project1, new_project2]) }
-        .to change { user.read_attribute(:projects) }
-        .from([{title: 'Genesis'}].to_json)
-        .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json)
+      expect do
+        user.projects = [new_project1, new_project2]
+        user.association(:projects).sync
+      end
+        .to change { user.projects(true) }
+        .from([])
+        .to([have_attributes(title: 'Project 1'), have_attributes(title: 'Project 2')])
     end
   end
 
@@ -54,23 +59,10 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
       specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
     end
 
-    describe '#create' do
-      let(:project) { Project.new title: 'Project' }
-      specify { expect(user.projects.create(title: 'Project')).to eq(project) }
-      specify { expect { user.projects.create(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-    end
-
-    describe '#create!' do
-      let(:project) { Project.new title: 'Project' }
-      specify { expect(user.projects.create!(title: 'Project')).to eq(project) }
-      specify { expect { user.projects.create!(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-    end
-
     describe '#reload' do
       let(:project) { Project.new title: 'Project' }
       before do
-        user.update(projects: [project])
-        user.apply_association_changes!
+        user.write_attribute(:projects, [{title: 'Project'}])
       end
       before { user.projects.build }
 
@@ -120,8 +112,8 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project'}]) }
+      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
+      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project')]) }
     end
 
     context do
@@ -138,8 +130,8 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project', 'value' => nil}]) }
+      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
+      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project', value: nil)]) }
     end
   end
 end
