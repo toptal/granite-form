@@ -4,7 +4,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
   before do
     stub_class(:author, ActiveRecord::Base) do
       scope :name_starts_with_a, -> { name_starts_with('a') }
-      scope :name_starts_with, ->(letter) { where("name LIKE '#{letter}%'") }
+      scope :name_starts_with, ->(letter) { where("name ILIKE '#{letter}%'") }
     end
 
     stub_model(:book) do

@@ -29,7 +29,9 @@ describe Granite::Form::Model::Associations::ReferencesOne do
   end
 
   describe 'book#inspect' do
-    specify { expect(existing_book.inspect).to eq('#<Book author: #<ReferencesOne #<Author id: 1, name: "Johny">>, title: "My Life", author_id: 1>') }
+    specify { expect(existing_book.inspect).to eq(<<~STR.chomp) }
+      #<Book author: #<ReferencesOne #{author.inspect}>, title: "My Life", author_id: #{author.id}>
+    STR
   end
 
   describe '#target' do
@@ -110,7 +112,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
     end
 
     context 'persisted owner' do
-      let(:new_author) { Author.create(name: 'Morty') }
+      let(:new_author) { Author.create!(name: 'Morty') }
 
       specify do
         expect { association.writer(stub_model(:dummy).new) }
@@ -125,7 +127,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
       end
       specify do
         expect { association.writer(new_author) }
-          .to change { association.reader.try(:attributes) }.from(nil).to('id' => 1, 'name' => 'Morty')
+          .to change { association.reader.try(:attributes) }.from(nil).to('id' => new_author.id, 'name' => 'Morty')
       end
       specify do
         expect { association.writer(new_author) }
@@ -159,7 +161,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
       specify do
         expect { existing_association.writer(new_author) }
           .to change { existing_association.reader.try(:attributes) }
-          .from('id' => 1, 'name' => 'Johny').to('id' => 2, 'name' => 'Morty')
+          .from('id' => author.id, 'name' => 'Johny').to('id' => new_author.id, 'name' => 'Morty')
       end
       specify do
         expect { existing_association.writer(new_author) }
