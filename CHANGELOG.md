@@ -1,6 +1,7 @@
 # master
 
 ## Next
+## v0.3.0
 
 - [BREAKING] Stop automatically saving `references_one`/`references_many` when applying changes.
 - [BREAKING] Removed Lifecycle module. `embeds_many`/`embeds_one` objects can no longer be created/saved/updated/destroyed.
