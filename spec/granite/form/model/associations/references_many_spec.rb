@@ -4,7 +4,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
   before do
     stub_model(:dummy)
     stub_class(:author, ActiveRecord::Base) do
-      scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+      scope :name_starts_with_a, -> { where('name ILIKE "a%"') }
 
       validates :name, presence: true
     end
@@ -33,7 +33,9 @@ describe Granite::Form::Model::Associations::ReferencesMany do
   end
 
   describe 'book#inspect' do
-    specify { expect(existing_book.inspect).to eq('#<Book authors: #<ReferencesMany [#<Author id: 1, name: "Rick">]>, title: "Genesis", author_ids: [1]>') }
+    specify { expect(existing_book.inspect).to eq(<<~STR.chomp) }
+      #<Book authors: #<ReferencesMany [#{author.inspect}]>, title: "Genesis", author_ids: [#{author.id}]>
+    STR
   end
 
   describe '#scope' do
@@ -213,7 +215,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
     end
     specify do
       expect { association.concat(new_author1) }
-        .to change { book.read_attribute(:author_ids) }.from([]).to([1])
+        .to change { book.read_attribute(:author_ids) }.from([]).to([new_author1.id])
     end
 
     specify do

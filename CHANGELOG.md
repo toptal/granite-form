@@ -3,6 +3,9 @@
 ## Next
 
 - [BREAKING] Stop automatically saving `references_one`/`references_many` when applying changes.
+- [BREAKING] Removed Lifecycle module. `embeds_many`/`embeds_one` objects can no longer be created/saved/updated/destroyed.
+- [BREAKING] Due to changes above `accepts_nested_attributes_for` for `embeds_many`/`embeds_one` associations no longer marks objects for destruction but simply removes them, making changes instantly.
+- Drop support for ruby 2.3 and rails 4.2
 
 ## v0.2.0
 

@@ -11,22 +11,22 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.name = 'granite-form'
   gem.require_paths = ['lib']
-  gem.required_ruby_version = '>= 2.3.0'
+  gem.required_ruby_version = '>= 2.4.0'
   gem.version = Granite::Form::VERSION
 
-  gem.add_development_dependency 'actionpack', '>= 4.2'
-  gem.add_development_dependency 'activerecord', '>= 4.2'
+  gem.add_development_dependency 'actionpack', '>= 5.0'
+  gem.add_development_dependency 'activerecord', '>= 5.0'
   gem.add_development_dependency 'appraisal'
   gem.add_development_dependency 'bump'
   gem.add_development_dependency 'database_cleaner'
+  gem.add_development_dependency 'pg'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 3.7.0'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rubocop', '0.52.1'
-  gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'uuidtools'
 
-  gem.add_runtime_dependency 'activemodel', '>= 4.2'
-  gem.add_runtime_dependency 'activesupport', '>= 4.2'
+  gem.add_runtime_dependency 'activemodel', '>= 5.0'
+  gem.add_runtime_dependency 'activesupport', '>= 5.0'
   gem.add_runtime_dependency 'tzinfo'
 end
