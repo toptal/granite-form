@@ -30,7 +30,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
   describe 'book#inspect' do
     specify { expect(existing_book.inspect).to eq(<<~STR.chomp) }
-      #<Book author: #<ReferencesOne #{author.inspect}>, title: "My Life", author_id: #{author.id}>
+      #<Book author: #<ReferencesOne #{author.inspect.truncate(50)}>, title: "My Life", author_id: #{author.id}>
     STR
   end
 
@@ -127,7 +127,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
       end
       specify do
         expect { association.writer(new_author) }
-          .to change { association.reader.try(:attributes) }.from(nil).to('id' => new_author.id, 'name' => 'Morty')
+          .to change { association.reader }.from(nil).to(new_author)
       end
       specify do
         expect { association.writer(new_author) }
@@ -160,8 +160,8 @@ describe Granite::Form::Model::Associations::ReferencesOne do
       end
       specify do
         expect { existing_association.writer(new_author) }
-          .to change { existing_association.reader.try(:attributes) }
-          .from('id' => author.id, 'name' => 'Johny').to('id' => new_author.id, 'name' => 'Morty')
+          .to change { existing_association.reader }
+          .from(author).to(new_author)
       end
       specify do
         expect { existing_association.writer(new_author) }

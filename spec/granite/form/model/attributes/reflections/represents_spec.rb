@@ -6,32 +6,55 @@ describe Granite::Form::Model::Attributes::Reflections::Represents do
   end
 
   describe '.build' do
-    before { stub_class(:target) }
-
-    specify do
-      described_class.build(Class.new, Target, :field, of: :subject)
-
-      expect(Target).to be_method_defined(:field)
-      expect(Target).to be_method_defined(:field=)
-      expect(Target).to be_method_defined(:field?)
-      expect(Target).to be_method_defined(:field_before_type_cast)
-      expect(Target).to be_method_defined(:field_default)
-      expect(Target).to be_method_defined(:field_values)
+    def build_reflection(column = :name, **options)
+      described_class.build(Target, Target, column, of: :subject, **options)
     end
-  end
 
-  describe '.generate_methods' do
-    before { stub_class(:target) }
+    before do
+      stub_model(:author) do
+        attribute :name, String
+        attribute :age, Integer
+      end
 
-    specify do
-      described_class.generate_methods(:field_alias, Target)
+      stub_model(:target) do
+        attribute :author, Author
+        alias_attribute :subject, :author
+      end
+    end
 
-      expect(Target).to be_method_defined(:field_alias)
-      expect(Target).to be_method_defined(:field_alias=)
-      expect(Target).to be_method_defined(:field_alias?)
-      expect(Target).to be_method_defined(:field_alias_before_type_cast)
-      expect(Target).to be_method_defined(:field_alias_default)
-      expect(Target).to be_method_defined(:field_alias_values)
+    let(:instance) { Target.new attributes }
+    let(:attributes) { {subject: Author.new} }
+    let!(:reflection) { build_reflection }
+
+    it { expect(reflection.reference).to eq('author') }
+
+    it do
+      expect(Target).to be_method_defined(:name)
+      expect(Target).to be_method_defined(:name=)
+      expect(Target).to be_method_defined(:name?)
+      expect(Target).to be_method_defined(:name_before_type_cast)
+      expect(Target).to be_method_defined(:name_default)
+      expect(Target).to be_method_defined(:name_values)
+    end
+
+    it { expect(instance).to be_valid }
+
+    context 'with missing `of` attribute value' do
+      let(:attributes) { super().except(:subject) }
+
+      it { expect { instance.validate }.to change { instance.errors.messages }.to(author: ["can't be blank"]) }
+
+      context 'with multiple reflections' do
+        before { build_reflection(:age) }
+
+        it { expect { instance.validate }.to change { instance.errors.messages }.to(author: ["can't be blank"]) }
+      end
+
+      context 'when validate_reference is false' do
+        let(:reflection) { build_reflection(validate_reference: false) }
+
+        it { expect { instance.validate }.not_to change { instance.errors.messages } }
+      end
     end
   end
 

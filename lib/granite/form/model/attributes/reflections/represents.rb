@@ -10,8 +10,12 @@ module Granite
               reference = target.reflect_on_association(options[:of]) if target.respond_to?(:reflect_on_association)
               reference ||= target.reflect_on_attribute(options[:of]) if target.respond_to?(:reflect_on_attribute)
               options[:of] = reference.name if reference
-              validates_nested = target.respond_to?(:validates_nested) && !target.validates_nested?(options[:of])
-              target.validates_nested(options[:of]) if validates_nested
+
+              if options.fetch(:validate_reference, true)
+                validates_nested = target.respond_to?(:validates_nested) && !target.validates_nested?(options[:of])
+                target.validates_nested(options[:of]) if validates_nested
+                target.validates_presence_of(options[:of]) unless target.validates_presence?(options[:of])
+              end
 
               super(target, generated_methods, name, *args, options, &block)
             end

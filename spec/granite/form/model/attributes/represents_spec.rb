@@ -1,85 +1,214 @@
 require 'spec_helper'
 
 describe Granite::Form::Model::Attributes::Represents do
-  before { stub_model(:dummy) }
-
-  def attribute(*args)
-    options = args.extract_options!
-    Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Represents, :full_name, options.reverse_merge(of: :subject))
-    Dummy.new.attribute(:full_name)
-  end
-
   before do
-    stub_model :subject do
-      attribute :full_name, String
+    stub_model :author
+    stub_model(:model) do
+      def author
+        @author ||= Author.new
+      end
     end
   end
 
-  describe '#new' do
-    before { attribute(:full_name) }
+  let(:model) { Model.new }
+  let(:attribute) { add_attribute }
+
+  def add_attribute(*args)
+    options = args.extract_options!.reverse_merge(of: :author)
+    name = args.first || :name
+    reflection = Model.add_attribute(Granite::Form::Model::Attributes::Reflections::Represents, name, options)
+    model.attribute(reflection.name)
+  end
+
+  describe '#initialize' do
+    before { Author.attribute :name, String, default: 'Default Name' }
+
     let(:attributes) { {foo: 'bar'} }
 
-    specify { expect { Dummy.new(attributes) }.to_not change { attributes } }
-  end
+    it { expect { Model.new(attributes) }.to_not change { attributes } }
 
-  describe '#write' do
-    subject { Subject.new }
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
-    let(:field) { attribute }
+    it { expect(attribute.read).to eq('Default Name') }
+    it { expect(attribute.read_before_type_cast).to eq('Default Name') }
 
-    specify { expect { field.write('hello') }.to change { subject.full_name }.to('hello') }
-  end
+    it { expect(add_attribute(default: -> { 'Field Default' }).read).to eq('Default Name') }
 
-  describe '#read' do
-    subject { Subject.new(full_name: :hello) }
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
-    let(:field) { attribute(normalizer: ->(v) { v && v.is_a?(String) ? v.strip : v }, default: :world, enum: ['hello', '42', 'world', :world]) }
+    context 'when owner changes value after initialize' do
+      before do
+        attribute
+        model.author.name = 'Changed Name'
+      end
 
-    specify { expect(field.read).to eq('hello') }
-    specify { expect(field.tap { |r| r.write(nil) }.read).to eq(:world) }
-    specify { expect(field.tap { |r| r.write(:world) }.read).to eq('world') }
-    specify { expect(field.tap { |r| r.write('hello') }.read).to eq('hello') }
-    specify { expect(field.tap { |r| r.write(' hello ') }.read).to eq(nil) }
-    specify { expect(field.tap { |r| r.write(42) }.read).to eq('42') }
-    specify { expect(field.tap { |r| r.write(43) }.read).to eq(nil) }
-    specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
-
-    specify { expect { subject.full_name = 42 }.to change { field.read }.to('42') }
-
-    context ':readonly' do
-      specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read).to eq('hello') }
-    end
-
-    context do
-      subject { Subject.new }
-      let(:field) { attribute(default: -> { Time.now.to_f }) }
-      specify { expect { sleep(0.01) }.not_to change { field.read } }
+      it { expect(attribute.read).to eq('Default Name') }
+      it { expect(attribute.read_before_type_cast).to eq('Default Name') }
     end
   end
 
-  describe '#read_before_type_cast' do
-    subject { Subject.new(full_name: :hello) }
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
-    let(:field) { attribute(normalizer: ->(v) { v.strip }, default: :world, enum: %w[hello 42 world]) }
-
-    specify { expect(field.read_before_type_cast).to eq(:hello) }
-    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
-    specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
-    specify { expect(field.tap { |r| r.write('hello') }.read_before_type_cast).to eq('hello') }
-    specify { expect(field.tap { |r| r.write(42) }.read_before_type_cast).to eq(42) }
-    specify { expect(field.tap { |r| r.write(43) }.read_before_type_cast).to eq(43) }
-    specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
-
-    specify { expect { subject.full_name = 42 }.to change { field.read_before_type_cast }.to(42) }
-
-    context ':readonly' do
-      specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read_before_type_cast).to eq(:hello) }
+  describe '#sync' do
+    before do
+      Author.attribute :name, String
+      attribute.write('New name')
     end
 
-    context do
-      subject { Subject.new }
-      let(:field) { attribute(default: -> { Time.now.to_f }) }
-      specify { expect { sleep(0.01) }.not_to change { field.read_before_type_cast } }
+    it { expect { attribute.sync }.to change { model.author.name }.from(nil).to('New name') }
+
+    context 'when represented object does not respond to attribute name' do
+      let(:attribute) { add_attribute(:unknown_attribute) }
+
+      it { expect { attribute.sync }.not_to raise_error }
+    end
+  end
+
+  describe '#changed?' do
+    before { Author.attribute :name, Boolean }
+
+    specify do
+      expect(model).to receive(:name_changed?)
+      expect(attribute).not_to be_changed
+    end
+
+    context 'when attribute has default value' do
+      let(:attribute) { add_attribute default: -> { true } }
+
+      specify do
+        expect(model).not_to receive(:name_changed?)
+        expect(attribute).to be_changed
+      end
+    end
+
+    context 'when attribute has false as default value' do
+      let(:attribute) { add_attribute default: false }
+
+      specify do
+        expect(model).not_to receive(:name_changed?)
+        expect(attribute).to be_changed
+      end
+    end
+  end
+
+  describe 'typecasting' do
+    before { Author.attribute :name, String }
+
+    def typecast(value)
+      attribute.write(value)
+      attribute.read
+    end
+
+    it 'returns original value when it has right class' do
+      expect(typecast('1')).to eq '1'
+    end
+
+    it 'returns converted value to a proper type' do
+      expect(typecast(1)).to eq '1'
+    end
+
+    it 'ignores nil' do
+      expect(typecast(nil)).to be_nil
+    end
+  end
+
+  describe '#type_definition' do
+    it { expect(add_attribute.type_definition).to have_attributes(type: Object, owner: model) }
+    it { expect(add_attribute(type: String).type_definition).to have_attributes(type: String, owner: model) }
+
+    context 'when defined in attribute' do
+      before { Author.attribute :name, String }
+
+      it { expect(add_attribute.type_definition).to have_attributes(type: String, owner: model) }
+      it { expect(add_attribute(type: Integer).type_definition).to have_attributes(type: Integer, owner: model) }
+    end
+
+    context 'when defined in represented attribute' do
+      before do
+        stub_model(:real_author) do
+          attribute :name, Boolean
+        end
+        Author.class_eval do
+          include Granite::Form::Model::Representation
+          represents :name, of: :subject
+
+          def subject
+            @subject ||= RealAuthor.new
+          end
+        end
+      end
+
+      it { expect(add_attribute.type_definition).to have_attributes(type: Boolean, owner: model) }
+    end
+
+    context 'when defined in references_many' do
+      before do
+        stub_class(:user, ActiveRecord::Base)
+        Author.class_eval do
+          include Granite::Form::Model::Associations
+          references_many :users
+        end
+      end
+
+      it do
+        attribute = add_attribute(:user_ids)
+        expect(attribute.type_definition).to be_a(Granite::Form::Types::Collection)
+        expect(attribute.type_definition.subtype_definition).to have_attributes(type: Integer, owner: model)
+      end
+    end
+
+    context 'when defined in collection' do
+      before do
+        Author.collection :users, String
+      end
+
+      it do
+        attribute = add_attribute(:users)
+        expect(attribute.type_definition).to be_a(Granite::Form::Types::Collection)
+        expect(attribute.type_definition.subtype_definition).to have_attributes(type: String, owner: model)
+      end
+    end
+
+    context 'when defined in dictionary' do
+      before do
+        Author.dictionary :numbers, Float
+      end
+
+      it do
+        attribute = add_attribute(:numbers)
+        expect(attribute.type_definition).to be_a(Granite::Form::Types::Collection)
+        expect(attribute.type_definition.subtype_definition).to have_attributes(type: Float, owner: model)
+      end
+    end
+
+    context 'when defined in ActiveRecord::Base' do
+      before do
+        stub_class(:author, ActiveRecord::Base) do
+          alias_attribute :full_name, :name
+        end
+      end
+
+      it { expect(add_attribute.type_definition).to have_attributes(type: String, owner: model) }
+      it { expect(add_attribute(:status).type_definition).to have_attributes(type: Integer, owner: model) }
+      it { expect(add_attribute(:full_name).type_definition).to have_attributes(type: String, owner: model) }
+      it { expect(add_attribute(:unknown_attribute).type_definition).to have_attributes(type: Object, owner: model) }
+      it do
+        attribute = add_attribute(:related_ids)
+        expect(attribute.type_definition).to be_a(Granite::Form::Types::Collection)
+        expect(attribute.type_definition.subtype_definition).to have_attributes(type: Integer, owner: model)
+      end
+
+      context 'with enum' do
+        before do
+          if ActiveRecord.gem_version >= Gem::Version.new('7.0')
+            Author.enum :status, once: 1, many: 2
+          else
+            Author.enum status: %i[once many]
+          end
+        end
+
+        it { expect(add_attribute(:status).type_definition).to have_attributes(type: String, owner: model) }
+      end
+
+      context 'with serialized attribute' do
+        before { Author.serialize :data }
+
+        it { expect(add_attribute(:data).type_definition).to have_attributes(type: Object, owner: model) }
+      end
     end
   end
 end

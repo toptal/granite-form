@@ -11,6 +11,16 @@ module Granite
               options[:validate] = true unless options.key?(:validate)
               super
             end
+
+            def self.generate_methods(name, target)
+              super
+
+              target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def build_#{name} attributes = {}
+                  association(:#{name}).build(attributes)
+                end
+              RUBY
+            end
           end
         end
       end

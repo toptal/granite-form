@@ -178,6 +178,13 @@ module Granite
 
         alias_method :attributes=, :assign_attributes
 
+        def sync_attributes
+          attribute_names.each do |name|
+            attr = attribute(name)
+            attr.try(:sync) if attr.try(:changed?)
+          end
+        end
+
         def inspect
           "#<#{self.class.send(:original_inspect)} #{attributes_for_inspect.presence || '(no attributes)'}>"
         end

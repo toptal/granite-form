@@ -23,15 +23,12 @@ describe Granite::Form::Model::Representation do
     specify { expect(Post.new(author: author).rate).to eq(42) }
     specify { expect(Post.new(author: author).rate_before_type_cast).to eq('42') }
     specify { expect(Post.new(rate: '33', author: author).rate).to eq(33) }
-    specify { expect(Post.new(rate: '33', author: author).author.rate).to eq(33) }
     specify { expect(Post.new(r: '33', author: author).rate).to eq(33) }
-    specify { expect(Post.new(r: '33', author: author).author.rate).to eq(33) }
     specify { expect(Post.new(author: author).rate?).to eq(true) }
     specify { expect(Post.new(rate: nil, author: author).rate?).to eq(false) }
 
     specify { expect(Post.new.rate).to be_nil }
     specify { expect(Post.new.rate_before_type_cast).to be_nil }
-    specify { expect { Post.new(rate: '33') }.to raise_error(NoMethodError) }
 
     context 'ActionController::Parameters' do
       let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: {rate: '33', author: author}) }
@@ -48,12 +45,13 @@ describe Granite::Form::Model::Representation do
         expect(Post.new(author: author, rate: '33').changes)
           .to eq('author' => [nil, author], 'rate' => [42, 33])
 
+        author.rate = 33
         expect(Post.new(author: author, rate: '33').changes)
           .to eq('author' => [nil, author])
       end
     end
 
-    context do
+    context 'when represents references_one association' do
       before do
         stub_class(:author, ActiveRecord::Base)
 
@@ -71,7 +69,6 @@ describe Granite::Form::Model::Representation do
       specify { expect(Post.reflect_on_attribute(:name).reference).to eq('author') }
 
       specify { expect(Post.new(name: '33', author: author).name).to eq('33') }
-      specify { expect(Post.new(name: '33', author: author).author.name).to eq('33') }
     end
 
     context 'multiple attributes in a single represents definition' do
@@ -89,11 +86,11 @@ describe Granite::Form::Model::Representation do
         end
       end
 
-      let(:author) { Author.new(first_name: 'John', last_name: 'Doe') }
+      let(:author) { Author.new }
       let(:post) { Post.new }
 
       specify do
-        expect { post.update(author: author) }
+        expect { post.update(first_name: 'John', last_name: 'Doe') }
           .to change { post.first_name }.to('John')
           .and change { post.last_name }.to('Doe')
       end
