@@ -1,5 +1,9 @@
-name: CI
-on: [push, pull_request]
+name: Ruby
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 jobs:
   rspec:
     strategy:
@@ -12,10 +16,25 @@ jobs:
           - { ruby: '2.6', rails: '5.2' }
           - { ruby: '2.7', rails: '6.0' }
           - { ruby: '3.0', rails: '6.1' }
-          - { ruby: '3.0', rails: '7.0' }
+          - { ruby: '3.1', rails: '7.0' }
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails.${{ matrix.rails }}.gemfile
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: granite
+          POSTGRES_PASSWORD: granite
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1

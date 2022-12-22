@@ -104,7 +104,7 @@ module Granite
             if block.arity >= 0 && block.arity <= args.length
               owner.instance_exec(*args.first(block.arity), &block)
             else
-              args = block.arity < 0 ? args : args.first(block.arity)
+              args = block.arity.negative? ? args : args.first(block.arity)
               yield(*args, owner)
             end
           end
