@@ -56,6 +56,9 @@ module Granite
               false
             end
 
+            # AR compatibility for preloading models within ar_lazy_preload
+            def scope; end
+
             def build_association(object)
               self.class.association_class.new object, self
             end
