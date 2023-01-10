@@ -1,10 +1,37 @@
 require 'spec_helper'
 
 describe Granite::Form::Model::Validations do
+  let!(:add_validations) { model.validates :name, presence: true }
+
   let(:model) do
     stub_model(:model) do
       attribute :name, String
-      validates :name, presence: true
+    end
+  end
+
+  before { add_validations }
+
+  describe '.validates_nested?' do
+    subject { model.validates_presence?(:name) }
+
+    it { is_expected.to be_truthy }
+
+    context 'when using string name' do
+      subject { model.validates_presence?('name') }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when attribute has no validations' do
+      let(:add_validations) {}
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when attribute has different validations' do
+      let(:add_validations) { model.validates :name, length: {maximum: 100} }
+
+      it { is_expected.to be_falsey }
     end
   end
 

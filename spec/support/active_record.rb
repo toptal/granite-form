@@ -16,5 +16,8 @@ ActiveRecord::Schema.define do
 
   create_table :authors, force: :cascade do |t|
     t.column :name, :string
+    t.column :status, :integer
+    t.column :related_ids, :integer, array: true
+    t.column :data, :text
   end
 end

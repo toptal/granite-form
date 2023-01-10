@@ -12,6 +12,12 @@ module Granite
           alias_method :validate, :valid?
         end
 
+        class_methods do
+          def validates_presence?(attr)
+            _validators[attr.to_sym].grep(ActiveModel::Validations::PresenceValidator).present?
+          end
+        end
+
         def validate!(context = nil)
           valid?(context) || raise_validation_error
         end

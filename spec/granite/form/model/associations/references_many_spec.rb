@@ -34,7 +34,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
 
   describe 'book#inspect' do
     specify { expect(existing_book.inspect).to eq(<<~STR.chomp) }
-      #<Book authors: #<ReferencesMany [#{author.inspect}]>, title: "Genesis", author_ids: [#{author.id}]>
+      #<Book authors: #<ReferencesMany #{[author].inspect.truncate(50, omission: '...]')}>, title: "Genesis", author_ids: [#{author.id}]>
     STR
   end
 

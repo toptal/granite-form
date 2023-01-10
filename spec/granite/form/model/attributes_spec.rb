@@ -198,6 +198,35 @@ describe Granite::Form::Model::Attributes do
     end
   end
 
+  describe '#sync_attributes' do
+    before do
+      stub_class :author, ActiveRecord::Base do
+        alias_attribute :full_name, :name
+      end
+
+      stub_model :model do
+        include Granite::Form::Model::Dirty
+        include Granite::Form::Model::Representation
+
+        attribute :age, Integer
+        attribute :author, Author
+        represents :name, :full_name, of: :author
+      end
+    end
+
+    let(:author) { Author.new }
+    let(:model) { Model.new(attributes) }
+    let(:attributes) { {author: author, name: 'Author Name', full_name: nil, age: 25} }
+
+    it { expect { model.sync_attributes }.to change(author, :name).to('Author Name') }
+
+    context 'with aliased attribute' do
+      let(:attributes) { super().merge(name: nil, full_name: 'Name Alias') }
+
+      it { expect { model.sync_attributes }.to change(author, :name).to('Name Alias') }
+    end
+  end
+
   describe '#inspect' do
     specify { expect(stub_model.new.inspect).to match(/#<#<Class:0x\w+> \(no attributes\)>/) }
     specify { expect(stub_model(:user).new.inspect).to match(/#<User \(no attributes\)>/) }
