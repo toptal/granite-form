@@ -53,4 +53,10 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
     specify { expect(reflection(in: -> {}).enum).to be_a Proc }
     specify { expect(reflection(enum: 42, in: -> {}).enum).to eq(42) }
   end
+
+  describe '#keys' do
+    specify { expect(reflection.keys).to eq([]) }
+    specify { expect(reflection(keys: ['a', :b]).keys).to eq(%w[a b]) }
+    specify { expect(reflection(keys: :c).keys).to eq(%w[c]) }
+  end
 end

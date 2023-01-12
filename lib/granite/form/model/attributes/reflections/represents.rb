@@ -4,6 +4,10 @@ module Granite
       module Attributes
         module Reflections
           class Represents < Attribute
+            def self.attribute_class
+              Attributes::Represents
+            end
+
             def self.build(target, generated_methods, name, *args, &block)
               options = args.extract_options!
 

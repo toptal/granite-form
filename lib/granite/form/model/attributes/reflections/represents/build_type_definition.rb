@@ -5,11 +5,7 @@ module Granite
         module Reflections
           class Represents
             class BuildTypeDefinition < Base::BuildTypeDefinition
-              GRANITE_COLLECTION_TYPES = [
-                Granite::Form::Model::Attributes::ReferenceMany,
-                Granite::Form::Model::Attributes::Collection,
-                Granite::Form::Model::Attributes::Dictionary
-              ].freeze
+              GRANITE_COLLECTION_TYPES = [Granite::Form::Model::Attributes::ReferenceMany].freeze
               TYPES = {
                 'ActiveRecord::Enum::EnumType' => String,
                 'ActiveRecord::Type::Serialized' => Object
@@ -35,7 +31,7 @@ module Granite
                 reference_attribute = reference.attribute(name)
                 return nil if reference_attribute.nil?
 
-                type_definition = type_definition_for(reference_attribute.type)
+                type_definition = reference_attribute.type_definition.build_duplicate(reflection, owner)
                 if GRANITE_COLLECTION_TYPES.any? { |klass| reference_attribute.is_a? klass }
                   Types::Collection.new(type_definition)
                 else

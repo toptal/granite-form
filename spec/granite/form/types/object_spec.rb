@@ -23,6 +23,14 @@ RSpec.describe Granite::Form::Types::Object do
     it { is_expected.to have_attributes(type: String, reflection: reflection, owner: model) }
   end
 
+  describe '#build_duplicate' do
+    subject { type.build_duplicate(new_reflection, new_model) }
+    let(:new_model) { double('new_model') }
+    let(:new_reflection) { Granite::Form::Model::Attributes::Reflections::Base.new(:new_field) }
+
+    it { is_expected.to have_attributes(type: String, reflection: new_reflection, owner: new_model) }
+  end
+
   describe 'typecasting' do
     before { stub_class(:descendant) }
 
