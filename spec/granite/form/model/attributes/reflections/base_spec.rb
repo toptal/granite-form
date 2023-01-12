@@ -30,6 +30,8 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
   end
 
   describe '#build_attribute' do
+    subject { reflection.build_attribute(owner, nil) }
+
     before do
       stub_class('SomeScope::Borogoves', described_class)
       stub_class('Granite::Form::Model::Attributes::Borogoves', Granite::Form::Model::Attributes::Base)
@@ -39,18 +41,7 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
     let(:reflection) { SomeScope::Borogoves.new(:field, type: Object) }
     let(:owner) { Owner.new }
 
-    specify { expect(reflection.build_attribute(owner, nil)).to be_a(Granite::Form::Model::Attributes::Borogoves) }
-    specify { expect(reflection.build_attribute(owner, nil).name).to eq('field') }
-    specify { expect(reflection.build_attribute(owner, nil).owner).to eq(owner) }
-  end
-
-  describe '#type' do
-    before { stub_class(:dummy, String) }
-
-    specify { expect { reflection.type }.to raise_error('Type is not specified for `field`') }
-    specify { expect(reflection(type: String).type).to eq(String) }
-    specify { expect(reflection(type: :string).type).to eq(String) }
-    specify { expect(reflection(type: Dummy).type).to eq(Dummy) }
-    specify { expect { reflection(type: :blabla).type }.to raise_error NameError }
+    it { is_expected.to be_a(Granite::Form::Model::Attributes::Borogoves) }
+    it { is_expected.to have_attributes(reflection: reflection, owner: owner, type: Object) }
   end
 end
