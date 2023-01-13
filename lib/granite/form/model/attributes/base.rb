@@ -4,7 +4,7 @@ module Granite
       module Attributes
         class Base
           attr_reader :type_definition
-          delegate :type, :reflection, :owner, to: :type_definition
+          delegate :type, :reflection, :owner, :enum, to: :type_definition
           delegate :name, :readonly, to: :reflection
 
           def initialize(type_definition)

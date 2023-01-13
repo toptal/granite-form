@@ -29,6 +29,8 @@ module Granite
           MAPPING[value]
         end
 
+      private
+
         def typecast(value)
           self.class.typecast(value)
         end

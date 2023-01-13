@@ -4,6 +4,8 @@ module Granite
   module Form
     module Types
       class Float < Object
+      private
+
         def typecast(value)
           Float(value)
         rescue ArgumentError, TypeError

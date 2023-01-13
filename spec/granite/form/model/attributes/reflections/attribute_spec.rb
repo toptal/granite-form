@@ -43,15 +43,6 @@ describe Granite::Form::Model::Attributes::Reflections::Attribute do
     specify { expect(reflection(default: -> {}).defaultizer).to be_a Proc }
   end
 
-  describe '#enumerizer' do
-    specify { expect(reflection.enumerizer).to be_nil }
-    specify { expect(reflection(enum: 42).enumerizer).to eq(42) }
-    specify { expect(reflection(enum: -> {}).enumerizer).to be_a Proc }
-    specify { expect(reflection(in: 42).enumerizer).to eq(42) }
-    specify { expect(reflection(in: -> {}).enumerizer).to be_a Proc }
-    specify { expect(reflection(enum: 42, in: -> {}).enumerizer).to eq(42) }
-  end
-
   describe '#normalizers' do
     specify { expect(reflection.normalizers).to eq([]) }
     specify { expect(reflection(normalizer: -> {}).normalizers).to be_a Array }

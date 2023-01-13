@@ -44,4 +44,13 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
     it { is_expected.to be_a(Granite::Form::Model::Attributes::Borogoves) }
     it { is_expected.to have_attributes(reflection: reflection, owner: owner, type: Object) }
   end
+
+  describe '#enum' do
+    specify { expect(reflection.enum).to be_nil }
+    specify { expect(reflection(enum: 42).enum).to eq(42) }
+    specify { expect(reflection(enum: -> {}).enum).to be_a Proc }
+    specify { expect(reflection(in: 42).enum).to eq(42) }
+    specify { expect(reflection(in: -> {}).enum).to be_a Proc }
+    specify { expect(reflection(enum: 42, in: -> {}).enum).to eq(42) }
+  end
 end

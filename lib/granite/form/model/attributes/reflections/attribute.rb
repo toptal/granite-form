@@ -40,10 +40,6 @@ module Granite
               @defaultizer ||= options[:default]
             end
 
-            def enumerizer
-              @enumerizer ||= options[:enum] || options[:in]
-            end
-
             def normalizers
               @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
             end

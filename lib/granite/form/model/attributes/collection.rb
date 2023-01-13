@@ -4,9 +4,7 @@ module Granite
       module Attributes
         class Collection < Attribute
           def read
-            @value ||= normalize(read_before_type_cast.map do |value|
-              enumerize(type_definition.ensure_type(value))
-            end)
+            @value ||= normalize(read_before_type_cast.map { |value| type_definition.prepare(value) })
           end
 
           def read_before_type_cast

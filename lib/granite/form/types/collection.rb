@@ -9,11 +9,11 @@ module Granite
           @subtype_definition = subtype_definition
         end
 
-        def ensure_type(value)
+        def prepare(value)
           if value.respond_to? :transform_values
-            value.transform_values { |v| subtype_definition.ensure_type(v) }
+            value.transform_values { |v| subtype_definition.prepare(v) }
           elsif value.respond_to?(:map)
-            value.map { |v| subtype_definition.ensure_type(v) }
+            value.map { |v| subtype_definition.prepare(v) }
           end
         end
       end

@@ -24,7 +24,7 @@ module Granite
 
           def type_casted_value
             variable_cache(:value) do
-              type_definition.ensure_type(read_before_type_cast)
+              type_definition.prepare(read_before_type_cast)
             end
           end
 

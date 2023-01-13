@@ -9,10 +9,8 @@ module Granite
             @value ||= begin
                          hash = read_before_type_cast
                          hash = hash.stringify_keys.slice(*keys) if keys.present?
-
-                         normalize(Hash[hash.map do |key, value|
-                           [key, enumerize(type_definition.ensure_type(value))]
-                         end].with_indifferent_access).with_indifferent_access
+                         hash = Hash[hash.map { |key, value| [key, type_definition.prepare(value)] }]
+                         normalize(hash.with_indifferent_access).with_indifferent_access
                        end
           end
 

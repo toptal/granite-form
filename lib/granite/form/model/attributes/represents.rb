@@ -34,7 +34,7 @@ module Granite
             return unless reference.respond_to?(reader)
 
             variable_cache(:value) do
-              normalize(enumerize(type_definition.ensure_type(defaultize(reference.public_send(reader)))))
+              normalize(type_definition.prepare(defaultize(reference.public_send(reader))))
             end
           end
 

@@ -4,6 +4,8 @@ module Granite
   module Form
     module Types
       class UUID < Object
+      private
+
         def typecast(value)
           case value
           when UUIDTools::UUID
