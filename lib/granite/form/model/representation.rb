@@ -1,5 +1,6 @@
 require 'active_model/version'
 require 'granite/form/model/attributes/reflections/represents'
+require 'granite/form/model/attributes/reflections/represents/build_type_definition'
 require 'granite/form/model/attributes/represents'
 
 module Granite

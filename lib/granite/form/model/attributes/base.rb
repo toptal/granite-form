@@ -3,13 +3,12 @@ module Granite
     module Model
       module Attributes
         class Base
-          attr_reader :owner, :reflection
+          attr_reader :type_definition
+          delegate :type, :reflection, :owner, to: :type_definition
           delegate :name, :readonly, to: :reflection
-          delegate :type, to: :type_definition
 
-          def initialize(reflection, owner)
-            @reflection = reflection
-            @owner = owner
+          def initialize(type_definition)
+            @type_definition = type_definition
             @origin = :default
           end
 
@@ -56,10 +55,6 @@ module Granite
             !!(readonly.is_a?(Proc) ? evaluate(&readonly) : readonly)
           end
 
-          def type_definition
-            @type_definition ||= build_type_definition(reflection.type)
-          end
-
           def inspect_attribute
             value = case read
             when Date, Time, DateTime
@@ -95,10 +90,6 @@ module Granite
           end
 
         private
-
-          def build_type_definition(type)
-            Granite::Form.type_for(type).new(type, reflection, owner)
-          end
 
           def evaluate(*args, &block)
             if block.arity >= 0 && block.arity <= args.length

@@ -28,20 +28,14 @@ module Granite
             end
 
             def build_attribute(owner, raw_value = Granite::Form::UNDEFINED)
-              attribute = self.class.attribute_class.new(self, owner)
+              type_definition = self.class::BuildTypeDefinition.new(owner, self).call
+              attribute = self.class.attribute_class.new(type_definition)
               attribute.write_value(raw_value, origin: :persistence) unless raw_value == Granite::Form::UNDEFINED
               attribute
             end
 
             def type
-              @type ||= case options[:type]
-              when Class, Module
-                options[:type]
-              when nil
-                raise "Type is not specified for `#{name}`"
-              else
-                options[:type].to_s.camelize.constantize
-              end
+              options[:type]
             end
 
             def readonly

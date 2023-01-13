@@ -1,4 +1,5 @@
 require 'granite/form/model/attributes/reflections/base'
+require 'granite/form/model/attributes/reflections/base/build_type_definition'
 require 'granite/form/model/attributes/reflections/attribute'
 require 'granite/form/model/attributes/reflections/collection'
 require 'granite/form/model/attributes/reflections/dictionary'

@@ -2,6 +2,7 @@ module Granite
   module Form
     module Types
       class Collection
+        delegate :reflection, :owner, :type, :name, to: :subtype_definition
         attr_reader :subtype_definition
 
         def initialize(subtype_definition)
