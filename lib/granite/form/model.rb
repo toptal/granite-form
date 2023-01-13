@@ -22,6 +22,7 @@ module Granite
         include ActiveModel::Serialization
         include ActiveModel::Serializers::JSON
 
+        include Util
         include Conventions
         include Attributes
         include Validations

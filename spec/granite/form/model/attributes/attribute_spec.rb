@@ -46,8 +46,6 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute.default).to eq(nil) }
     specify { expect(attribute(default: 'hello').default).to eq('hello') }
     specify { expect(attribute(default: -> { value }).default).to eq(42) }
-    specify { expect(attribute(default: ->(object) { object.value }).default).to eq(42) }
-    specify { expect(attribute(default: ->(*args) { args.first.value }).default).to eq(42) }
   end
 
   describe '#defaultize' do
@@ -70,7 +68,6 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute(enum: -> { 'hello' }).enum).to eq(['hello'].to_set) }
     specify { expect(attribute(enum: -> { ['hello', 42] }).enum).to eq(['hello', 42].to_set) }
     specify { expect(attribute(enum: -> { value }).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(enum: ->(object) { object.value }).enum).to eq((1..5).to_a.to_set) }
   end
 
   describe '#enumerize' do
@@ -93,8 +90,6 @@ describe Granite::Form::Model::Attributes::Attribute do
       let(:other) { 'other' }
 
       specify { expect(attribute(normalizer: ->(_v) { value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(normalizer: ->(_v, object) { object.value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(normalizer: ->(_v, _object) { other }).normalize(' hello ')).to eq('other') }
     end
 
     context 'integration' do

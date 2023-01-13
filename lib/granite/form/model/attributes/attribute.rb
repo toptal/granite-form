@@ -25,7 +25,7 @@ module Granite
           end
 
           def default
-            defaultizer.is_a?(Proc) ? evaluate(&defaultizer) : defaultizer
+            owner.evaluate_if_proc(defaultizer)
           end
 
           def defaultize(value, default_value = nil)
@@ -33,7 +33,7 @@ module Granite
           end
 
           def enum
-            source = enumerizer.is_a?(Proc) ? evaluate(&enumerizer) : enumerizer
+            source = owner.evaluate(enumerizer)
 
             case source
             when Range
@@ -57,7 +57,7 @@ module Granite
               normalizers.inject(value) do |val, normalizer|
                 case normalizer
                 when Proc
-                  evaluate(val, &normalizer)
+                  owner.evaluate(normalizer, val)
                 when Hash
                   normalizer.inject(val) do |v, (name, options)|
                     Granite::Form.normalizer(name).call(v, options, self)

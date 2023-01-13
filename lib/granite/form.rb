@@ -8,6 +8,7 @@ require 'singleton'
 require 'active_model'
 
 require 'granite/form/version'
+require 'granite/form/util'
 require 'granite/form/errors'
 require 'granite/form/extensions'
 require 'granite/form/undefined_class'

@@ -172,9 +172,10 @@ It is possible to provide default values for attributes and they will act in the
 
 ```ruby
 attribute :check, Boolean, default: false # Simply false by default
-attribute :today, Date, default: ->{ Time.zone.now.to_date } # Dynamic default value
-attribute :today_wday, Integer, default: ->{ today.wday } # Default is evaluated in instance context
-attribute :today_wday, Integer, default: ->(instance) { instance.today.wday } # The same as previous, but instance provided explicitly
+attribute :wday, Integer, default: ->{ today.wday } # Default evaluated in instance context
+def calculate_today
+  Time.zone.now.today
+end
 ```
 
 ##### Enums
@@ -201,8 +202,8 @@ attribute :title, String, normalizers: [->(value) { value.strip }, trim: {length
 
 ```ruby
 attribute :name, String, readonly: true # Readonly forever
-attribute :name, String, readonly: -> { true } # Conditionally readonly
-attribute :name, String, readonly: ->(instance) { instance.subject.present? } # Explicit instance
+attribute :name, String, readonly: :name_changed? # Conditional with calling method
+attribute :name, String, readonly: -> { subject.present? } # Conditional with lambda
 ```
 
 #### Collection
