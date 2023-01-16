@@ -247,13 +247,14 @@ describe Granite::Form::Model::Attributes do
   context 'attributes integration' do
     let(:model) do
       stub_class do
+        include Granite::Form::Util
         include Granite::Form::Model::Attributes
         include Granite::Form::Model::Associations
         attr_accessor :name
 
         attribute :id, Integer
         attribute :hello, Object
-        attribute :string, String, default: ->(record) { record.name }
+        attribute :string, String, default: -> { name }
         attribute :count, Integer, default: '10'
         attribute(:calc, Integer) { 2 + 3 }
         attribute :enum, Integer, enum: [1, 2, 3]

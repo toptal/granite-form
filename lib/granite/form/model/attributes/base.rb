@@ -52,7 +52,7 @@ module Granite
           end
 
           def readonly?
-            !!(readonly.is_a?(Proc) ? evaluate(&readonly) : readonly)
+            !!owner.evaluate(readonly)
           end
 
           def inspect_attribute
@@ -90,15 +90,6 @@ module Granite
           end
 
         private
-
-          def evaluate(*args, &block)
-            if block.arity >= 0 && block.arity <= args.length
-              owner.instance_exec(*args.first(block.arity), &block)
-            else
-              args = block.arity.negative? ? args : args.first(block.arity)
-              yield(*args, owner)
-            end
-          end
 
           def remove_variable(*names)
             names.flatten.each do |name|
