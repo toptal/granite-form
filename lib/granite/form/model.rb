@@ -5,7 +5,6 @@ require 'granite/form/model/scopes'
 require 'granite/form/model/primary'
 require 'granite/form/model/persistence'
 require 'granite/form/model/associations'
-require 'granite/form/model/localization'
 require 'granite/form/model/representation'
 require 'granite/form/model/dirty'
 

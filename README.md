@@ -252,14 +252,6 @@ end
 
 The keys list might be restricted with the `:keys` option. Default and enum modifiers are applied on each value, normalizers are applied on the hash.
 
-#### Localized
-
-`localized` is similar to how `Globalize 3` attributes work.
-
-```ruby
-localized :title, String
-```
-
 #### Represents
 
 `represents` provides an easy way to expose model attributes through an interface.
