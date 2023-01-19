@@ -5,7 +5,6 @@ describe Granite::Form::Model::Dirty do
     stub_class(:author, ActiveRecord::Base) {}
     stub_model :premodel do
       include Granite::Form::Model::Persistence
-      include Granite::Form::Model::Localization
       include Granite::Form::Model::Associations
 
       attribute :age, Integer, default: 33
@@ -22,7 +21,6 @@ describe Granite::Form::Model::Dirty do
       attribute :name, String
       alias_attribute :n, :name
       collection :numbers, Integer
-      localized :title, String
     end
   end
 
@@ -69,10 +67,6 @@ describe Granite::Form::Model::Dirty do
   specify { expect(Model.instantiate(age: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [42, 43]) }
   specify { expect(Model.new(a: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [33, 43]) }
   specify { expect(Model.new(numbers: '42').changes).to eq('numbers' => [[], [42]]) }
-
-  # Have no idea how should it work right now
-  specify { expect(Model.new(title: 'Hello').changes).to eq('title' => [nil, 'Hello']) }
-  specify { expect(Model.new(title_translations: {en: 'Hello'}).changes).to eq('title' => [nil, 'Hello']) }
 
   specify { expect(Model.new).not_to respond_to :something_changed? }
   specify { expect(Model.new).to respond_to :n_changed? }

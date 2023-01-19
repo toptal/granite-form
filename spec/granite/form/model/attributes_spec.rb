@@ -4,14 +4,10 @@ describe Granite::Form::Model::Attributes do
   let(:model) do
     stub_model do
       include Granite::Form::Model::Associations
-      include Granite::Form::Model::Localization
 
       attribute :id, Integer
       attribute :full_name, String
       alias_attribute :name, :full_name
-
-      localized :t, String
-      alias_attribute :title, :t
 
       embeds_one(:author) {}
       embeds_many(:projects) {}
@@ -34,8 +30,8 @@ describe Granite::Form::Model::Attributes do
 
   describe '.attribute_names' do
     specify { expect(stub_model.attribute_names).to eq([]) }
-    specify { expect(model.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.attribute_names(false)).to eq(%w[id full_name t]) }
+    specify { expect(model.attribute_names).to eq(%w[id full_name author projects]) }
+    specify { expect(model.attribute_names(false)).to eq(%w[id full_name]) }
   end
 
   describe '.inspect' do
@@ -100,8 +96,8 @@ describe Granite::Form::Model::Attributes do
 
   describe '#attribute_names' do
     specify { expect(stub_model.new.attribute_names).to eq([]) }
-    specify { expect(model.new.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t]) }
+    specify { expect(model.new.attribute_names).to eq(%w[id full_name author projects]) }
+    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name]) }
   end
 
   describe '#attribute_present?' do
@@ -114,11 +110,11 @@ describe Granite::Form::Model::Attributes do
     specify { expect(stub_model.new.attributes).to eq({}) }
     specify do
       expect(model.new(name: 'Name').attributes)
-        .to match('id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil)
+        .to match('id' => nil, 'full_name' => 'Name', 'author' => nil, 'projects' => nil)
     end
     specify do
       expect(model.new(name: 'Name').attributes(false))
-        .to match('id' => nil, 'full_name' => 'Name', 't' => {})
+        .to match('id' => nil, 'full_name' => 'Name')
     end
   end
 
