@@ -14,7 +14,7 @@ module Granite
 
           def read
             variable_cache(:value) do
-              normalize(enumerize(type_definition.ensure_type(read_before_type_cast)))
+              normalize(type_definition.prepare(read_before_type_cast))
             end
           end
 
@@ -30,24 +30,6 @@ module Granite
 
           def defaultize(value, default_value = nil)
             !defaultizer.nil? && value.nil? ? default_value || default : value
-          end
-
-          def enum
-            source = owner.evaluate(enumerizer)
-
-            case source
-            when Range
-              source.to_a
-            when Set
-              source
-            else
-              Array.wrap(source)
-            end.to_set
-          end
-
-          def enumerize(value)
-            set = enum if enumerizer
-            value if !set || (set.none? || set.include?(value))
           end
 
           def normalize(value)

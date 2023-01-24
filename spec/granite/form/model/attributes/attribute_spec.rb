@@ -55,30 +55,6 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute(default: false, type: Boolean).defaultize(nil)).to eq(false) }
   end
 
-  describe '#enum' do
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 1..5) }
-
-    specify { expect(attribute.enum).to eq([].to_set) }
-    specify { expect(attribute(enum: []).enum).to eq([].to_set) }
-    specify { expect(attribute(enum: 'hello').enum).to eq(['hello'].to_set) }
-    specify { expect(attribute(enum: %w[hello world]).enum).to eq(%w[hello world].to_set) }
-    specify { expect(attribute(enum: [1..5]).enum).to eq([1..5].to_set) }
-    specify { expect(attribute(enum: 1..5).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(enum: -> { 1..5 }).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(enum: -> { 'hello' }).enum).to eq(['hello'].to_set) }
-    specify { expect(attribute(enum: -> { ['hello', 42] }).enum).to eq(['hello', 42].to_set) }
-    specify { expect(attribute(enum: -> { value }).enum).to eq((1..5).to_a.to_set) }
-  end
-
-  describe '#enumerize' do
-    specify { expect(attribute.enumerize('anything')).to eq('anything') }
-    specify { expect(attribute(enum: ['hello', 42]).enumerize('hello')).to eq('hello') }
-    specify { expect(attribute(enum: ['hello', 42]).enumerize('world')).to eq(nil) }
-    specify { expect(attribute(enum: -> { 'hello' }).enumerize('hello')).to eq('hello') }
-    specify { expect(attribute(enum: -> { 1..5 }).enumerize(2)).to eq(2) }
-    specify { expect(attribute(enum: -> { 1..5 }).enumerize(42)).to eq(nil) }
-  end
-
   describe '#normalize' do
     specify { expect(attribute.normalize(' hello ')).to eq(' hello ') }
     specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }

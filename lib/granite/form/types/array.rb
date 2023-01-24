@@ -4,6 +4,8 @@ module Granite
   module Form
     module Types
       class Array < Object
+      private
+
         def typecast(value)
           if value.is_a?(::String)
             value.split(',').map(&:strip)

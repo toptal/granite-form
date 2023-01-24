@@ -39,7 +39,11 @@ module Granite
             end
 
             def readonly
-              @readonly ||= options[:readonly]
+              options[:readonly]
+            end
+
+            def enum
+              options[:enum] || options[:in]
             end
 
             def inspect_reflection

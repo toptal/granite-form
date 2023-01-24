@@ -4,6 +4,8 @@ module Granite
   module Form
     module Types
       class HashWithActionControllerParameters < Object
+      private
+
         def typecast(value)
           case value
           when ActionController::Parameters
