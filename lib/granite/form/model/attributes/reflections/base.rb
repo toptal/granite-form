@@ -46,6 +46,10 @@ module Granite
               options[:enum] || options[:in]
             end
 
+            def keys
+              @keys ||= Array.wrap(options[:keys]).map(&:to_s)
+            end
+
             def inspect_reflection
               "#{name}: #{type}"
             end

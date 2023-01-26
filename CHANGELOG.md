@@ -2,9 +2,11 @@
 
 ## Next
 
-* Drop support for taking `model` as first argument in default/readonly/enum/normalize. This means that `default: -> (model) { model.other_field}` is no longer supported and should be replaced with `default: -> { other_field }`.
+* [BREAKING] Drop support for taking `model` as first argument in default/readonly/enum/normalize. This means that `default: -> (model) { model.other_field}` is no longer supported and should be replaced with `default: -> { other_field }`.
 * Add support for evaluating `Symbol` for readonly/enum/normalize. If symbol is passed in one of those options, method with that name will be called when evaluating the value.
-* Remove `localized` attribute type.
+* [BREAKING] Remove `localized` attribute type.
+* [BREAKING] Change the behavior of `default` and `normalize` for `collection` & `dictionary`. Instead of acting per element they will now act on the attribute as a whole.
+  * E.g. `collection :numbers, default: [1, 2, 3]` will not set the default for the whole collection of `numbers` rather than each element in `numbers`. 
 
 ## v0.3.0
 

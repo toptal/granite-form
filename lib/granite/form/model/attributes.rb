@@ -2,12 +2,12 @@ require 'granite/form/model/attributes/reflections/base'
 require 'granite/form/model/attributes/reflections/base/build_type_definition'
 require 'granite/form/model/attributes/reflections/attribute'
 require 'granite/form/model/attributes/reflections/collection'
+require 'granite/form/model/attributes/reflections/collection/build_type_definition'
 require 'granite/form/model/attributes/reflections/dictionary'
+require 'granite/form/model/attributes/reflections/dictionary/build_type_definition'
 
 require 'granite/form/model/attributes/base'
 require 'granite/form/model/attributes/attribute'
-require 'granite/form/model/attributes/collection'
-require 'granite/form/model/attributes/dictionary'
 
 module Granite
   module Form

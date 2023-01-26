@@ -86,7 +86,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents::BuildTypeDef
 
     it do
       attribute = build_type_definition(:numbers)
-      expect(attribute).to be_a(Granite::Form::Types::Collection)
+      expect(attribute).to be_a(Granite::Form::Types::Dictionary)
       expect(attribute.subtype_definition).to have_type(Float)
     end
   end

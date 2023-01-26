@@ -13,6 +13,10 @@ module Granite
           @owner = owner
         end
 
+        def build_duplicate(reflection, owner)
+          self.class.new(type, reflection, owner)
+        end
+
         def prepare(value)
           enumerize(ensure_type(value))
         end

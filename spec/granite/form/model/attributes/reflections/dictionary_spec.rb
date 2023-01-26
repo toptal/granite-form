@@ -34,10 +34,4 @@ describe Granite::Form::Model::Attributes::Reflections::Dictionary do
       expect(Target).to be_method_defined(:field_alias_values)
     end
   end
-
-  describe '#keys' do
-    specify { expect(reflection.keys).to eq([]) }
-    specify { expect(reflection(keys: ['a', :b]).keys).to eq(%w[a b]) }
-    specify { expect(reflection(keys: :c).keys).to eq(%w[c]) }
-  end
 end

@@ -256,7 +256,11 @@ describe Granite::Form::Model::Attributes do
         attribute :enum, Integer, enum: [1, 2, 3]
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: '2'
         attribute :foo, Boolean, default: false
-        collection :array, Integer, enum: [1, 2, 3], default: 7
+        collection :array, Integer, enum: [1, 2, 3], default: [2], normalizer: ->(v) { v.uniq }
+        dictionary :dict, Integer, keys: %w[from to], enum: [1, 2, 3], default: {from: 1}, normalizer: proc { |v|
+          next v if v[:from].nil? || v[:to].nil? || v[:from] <= v[:to]
+          {from: v[:to], to: v[:from]}.with_indifferent_access
+        }
 
         def initialize(name = nil)
           super()
@@ -312,23 +316,54 @@ describe Granite::Form::Model::Attributes do
       end
     end
 
-    context 'array' do
-      specify do
-        subject.array = [2, 4]
-        expect(subject.array).to eq([2, nil])
+    describe 'array' do
+      def with_assigned_value(value)
+        subject.array = value
+        expect(subject)
       end
+
       specify do
-        subject.array = [2, 4]
-        expect(subject.array?).to eq(true)
+        expect(subject).to have_attributes(
+          array: [2],
+          array_before_type_cast: [2],
+          array?: true,
+          array_default: [2],
+          array_values: [1, 2, 3]
+        )
       end
+
+      specify { with_assigned_value(nil).to have_attributes(array: [2], array_before_type_cast: [2]) }
+      specify { with_assigned_value([nil]).to have_attributes(array: [nil], array_before_type_cast: [nil]) }
+      specify { with_assigned_value(1).to have_attributes(array: [1], array_before_type_cast: 1) }
+      specify { with_assigned_value([1, 2]).to have_attributes(array: [1, 2], array_before_type_cast: [1, 2]) }
+      specify { with_assigned_value([2, 4]).to have_attributes(array: [2, nil], array_before_type_cast: [2, 4]) }
+      specify { with_assigned_value(%w[1 2]).to have_attributes(array: [1, 2], array_before_type_cast: %w[1 2]) }
+      specify { with_assigned_value([1, 2, 1]).to have_attributes(array: [1, 2], array_before_type_cast: [1, 2, 1]) }
+    end
+
+    describe 'dict' do
+      def with_assigned_value(value)
+        subject.dict = value
+        expect(subject)
+      end
+
       specify do
-        subject.array = [2, 4]
-        expect(subject.array_values).to eq([1, 2, 3])
+        expect(subject).to have_attributes(
+          dict: {from: 1},
+          dict_before_type_cast: {from: 1},
+          dict?: true,
+          dict_default: {from: 1},
+          dict_values: [1, 2, 3]
+        )
       end
-      specify do
-        subject.array = [2, 4]
-        expect(subject.array_default).to eq(7)
-      end
+
+      specify { with_assigned_value(nil).to have_attributes(dict: {'from' => 1}, dict_before_type_cast: {from: 1}) }
+      specify { with_assigned_value([nil]).to have_attributes(dict: {}, dict_before_type_cast: [nil]) }
+      specify { with_assigned_value(1).to have_attributes(dict: {}, dict_before_type_cast: 1) }
+      specify { with_assigned_value(from: 1, to: 2).to have_attributes(dict: {'from' => 1, 'to' => 2}, dict_before_type_cast: {from: 1, to: 2}) }
+      specify { with_assigned_value(from: 2, to: 4).to have_attributes(dict: {'from' => 2, 'to' => nil}, dict_before_type_cast: {from: 2, to: 4}) }
+      specify { with_assigned_value(from: '1', to: '2').to have_attributes(dict: {'from' => 1, 'to' => 2}, dict_before_type_cast: {from: '1', to: '2'}) }
+      specify { with_assigned_value(from: 3, to: 1).to have_attributes(dict: {'from' => 1, 'to' => 3}, dict_before_type_cast: {from: 3, to: 1}) }
     end
 
     context 'attribute caching' do
