@@ -1,6 +1,7 @@
 # master
 
 ## Next
+## v0.4.0
 
 * [BREAKING] Drop support for taking `model` as first argument in default/readonly/enum/normalize. This means that `default: -> (model) { model.other_field}` is no longer supported and should be replaced with `default: -> { other_field }`.
 * Add support for evaluating `Symbol` for readonly/enum/normalize. If symbol is passed in one of those options, method with that name will be called when evaluating the value.
