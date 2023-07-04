@@ -58,7 +58,7 @@ module Granite
           def inspect_attribute
             value = case read
             when Date, Time, DateTime
-              %("#{read.to_s(:db)}")
+              %("#{read.to_formatted_s(:db)}")
             else
               inspection = read.inspect
               inspection.size > 100 ? inspection.truncate(50) : inspection

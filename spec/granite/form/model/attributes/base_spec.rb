@@ -103,4 +103,22 @@ describe Granite::Form::Model::Attributes::Base do
 
     it { is_expected.to have_attributes(type: String, reflection: subject.reflection, owner: model) }
   end
+
+  describe '#inspect_attribute' do
+    let(:field) { attribute(type: type) }
+    let(:object) { Object.new }
+
+    {
+      'hello' => 'field: "hello"',
+      123 => 'field: 123',
+      Date.new(2023, 6, 20) => 'field: "2023-06-20"',
+      DateTime.new(2023, 6, 20, 12, 30) => 'field: "2023-06-20 12:30:00"', # rubocop:disable Style/DateTime
+      Time.new(2023, 6, 20, 12, 30) => 'field: "2023-06-20 12:30:00"'
+    }.each do |input, expected_output|
+      context "attribute type is #{input.class}" do
+        let(:type) { input.class }
+        specify { expect(field.tap { |r| r.write(input) }.inspect_attribute).to eq(expected_output) }
+      end
+    end
+  end
 end
