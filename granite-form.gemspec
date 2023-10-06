@@ -14,8 +14,8 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.4.0'
   gem.version = Granite::Form::VERSION
 
-  gem.add_development_dependency 'actionpack', '>= 5.0'
-  gem.add_development_dependency 'activerecord', '>= 5.0'
+  gem.add_development_dependency 'actionpack', '>= 6.0'
+  gem.add_development_dependency 'activerecord', '>= 6.0'
   gem.add_development_dependency 'appraisal'
   gem.add_development_dependency 'bump'
   gem.add_development_dependency 'database_cleaner'
@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rubocop', '0.52.1'
   gem.add_development_dependency 'uuidtools'
 
-  gem.add_runtime_dependency 'activemodel', '>= 5.0'
-  gem.add_runtime_dependency 'activesupport', '>= 5.0'
+  gem.add_runtime_dependency 'activemodel', '>= 6.0'
+  gem.add_runtime_dependency 'activesupport', '>= 6.0'
   gem.add_runtime_dependency 'tzinfo'
 end
