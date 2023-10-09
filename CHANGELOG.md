@@ -1,6 +1,14 @@
 # master
 
 ## Next
+
+## v0.5.0
+
+* Support for ruby 3.2 by @konalegi in https://github.com/toptal/granite-form/pull/22
+* Fix deprecated #to_s method by @mpiask in https://github.com/toptal/granite-form/pull/24
+* Support for Rails 7.1 by @ojab in https://github.com/toptal/granite-form/pull/25
+* [BREAKING] Drop support for Rails < 6.0 by @ojab in https://github.com/toptal/granite-form/pull/25
+
 ## v0.4.0
 
 * [BREAKING] Drop support for taking `model` as first argument in default/readonly/enum/normalize. This means that `default: -> (model) { model.other_field}` is no longer supported and should be replaced with `default: -> { other_field }`.
