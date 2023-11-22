@@ -172,7 +172,7 @@ module Granite
             if respond_to?("#{name}=") && !sanitize_value
               public_send("#{name}=", value)
             else
-              logger.info("Ignoring #{sanitize_value ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
+              logger.debug("Ignoring #{sanitize_value ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
             end
           end
         end
