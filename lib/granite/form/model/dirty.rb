@@ -60,18 +60,14 @@ module Granite
 
             %w[changed? change will_change! was
                previously_changed? previous_change].each do |suffix|
-              target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def #{method}_#{suffix}
-                attribute_#{suffix} '#{name}'
-              end
-              RUBY
+              target.define_method("#{method}_#{suffix}") do
+                  __send__(:"attribute_#{suffix}", name)
+                end
             end
 
-            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def restore_#{method}!
-              restore_attribute! '#{name}'
-            end
-            RUBY
+            target.define_method("restore_#{method}!") do
+                restore_attribute!(name)
+              end
           end
 
           def dirty?

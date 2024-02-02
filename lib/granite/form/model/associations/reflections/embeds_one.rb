@@ -15,11 +15,9 @@ module Granite
             def self.generate_methods(name, target)
               super
 
-              target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def build_#{name} attributes = {}
-                  association(:#{name}).build(attributes)
-                end
-              RUBY
+              target.define_method("build_#{name}") do |attributes = {}|
+                association(name.to_sym).build(attributes)
+              end
             end
           end
         end

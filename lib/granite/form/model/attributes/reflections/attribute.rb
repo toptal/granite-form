@@ -9,35 +9,33 @@ module Granite
             end
 
             def self.generate_methods(name, target)
-              target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def #{name}
-                attribute('#{name}').read
+              target.define_method(name) do
+                attribute(name).read
               end
 
-              def #{name}= value
-                attribute('#{name}').write(value)
+              target.define_method("#{name}=") do |value|
+                attribute(name).write(value)
               end
 
-              def #{name}?
-                attribute('#{name}').query
+              target.define_method("#{name}?") do
+                attribute(name).query
               end
 
-              def #{name}_before_type_cast
-                attribute('#{name}').read_before_type_cast
+              target.define_method("#{name}_before_type_cast") do
+                attribute(name).read_before_type_cast
               end
 
-              def #{name}_came_from_user?
-                attribute('#{name}').came_from_user?
+              target.define_method("#{name}_came_from_user?") do
+                attribute(name).came_from_user?
               end
 
-              def #{name}_default
-                attribute('#{name}').default
+              target.define_method("#{name}_default") do
+                attribute(name).default
               end
 
-              def #{name}_values
-                attribute('#{name}').enum.to_a
+              target.define_method("#{name}_values") do
+                attribute(name).enum.to_a
               end
-              RUBY
             end
 
             def defaultizer
