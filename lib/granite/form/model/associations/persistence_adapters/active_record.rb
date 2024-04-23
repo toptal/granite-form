@@ -17,7 +17,8 @@ module Granite
               text: String,
               string: String,
               binary: String,
-              boolean: Boolean
+              boolean: Boolean,
+              enum: String
             }.freeze
 
             alias_method :data_type, :data_source

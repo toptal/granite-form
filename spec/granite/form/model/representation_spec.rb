@@ -11,12 +11,15 @@ describe Granite::Form::Model::Representation do
         include Granite::Form::Model::Representation
 
         attribute :author, Object
+        attribute :foo_container, Object
         alias_attribute :a, :author
         represents :rate, of: :a
+        represents :foos, of: :foo_container
         alias_attribute :r, :rate
       end
     end
     let(:author) { Author.new(rate: '42') }
+    let(:foos) { %w[foo bar] }
 
     specify { expect(Post.reflect_on_attribute(:rate).reference).to eq('author') }
 
@@ -29,6 +32,10 @@ describe Granite::Form::Model::Representation do
 
     specify { expect(Post.new.rate).to be_nil }
     specify { expect(Post.new.rate_before_type_cast).to be_nil }
+
+    if ActiveModel.version >= Gem::Version.new('7.0.0') # rubocop:disable Style/IfUnlessModifier
+      specify { expect { Post.new(foo_container: FooContainer.new, foos: foos) }.not_to raise_exception }
+    end
 
     context 'ActionController::Parameters' do
       let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: {rate: '33', author: author}) }
