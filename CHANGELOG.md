@@ -2,6 +2,8 @@
 
 ## Next
 
+* Fix crash when mapping PostgreSQL enum to ruby variable in https://github.com/toptal/granite-form/pull/28
+
 ## v0.5.0
 
 * Support for ruby 3.2 by @konalegi in https://github.com/toptal/granite-form/pull/22
@@ -15,7 +17,7 @@
 * Add support for evaluating `Symbol` for readonly/enum/normalize. If symbol is passed in one of those options, method with that name will be called when evaluating the value.
 * [BREAKING] Remove `localized` attribute type.
 * [BREAKING] Change the behavior of `default` and `normalize` for `collection` & `dictionary`. Instead of acting per element they will now act on the attribute as a whole.
-  * E.g. `collection :numbers, default: [1, 2, 3]` will not set the default for the whole collection of `numbers` rather than each element in `numbers`. 
+  * E.g. `collection :numbers, default: [1, 2, 3]` will not set the default for the whole collection of `numbers` rather than each element in `numbers`.
 
 ## v0.3.0
 
@@ -32,7 +34,7 @@
 
 ## v0.1.1
 
-- Fixed represented error message copying when represented model uses symbols for `message`. 
+- Fixed represented error message copying when represented model uses symbols for `message`.
 
 ## v0.1.0
 
