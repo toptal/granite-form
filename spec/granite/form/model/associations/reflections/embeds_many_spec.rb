@@ -90,9 +90,10 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
         before { user.projects = [other] }
 
         specify do
-          expect { user.projects.concat project }.to change {
-                                                       user.projects
-                                                     }.from([other]).to([other, project])
+          expect { user.projects.concat project }
+            .to change { user.projects }
+            .from([other])
+            .to([other, project])
         end
       end
     end
