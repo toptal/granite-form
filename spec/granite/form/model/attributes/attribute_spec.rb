@@ -12,9 +12,8 @@ describe Granite::Form::Model::Attributes::Attribute do
 
   describe '#read' do
     let(:field) do
-      attribute(type: String, normalizer: lambda { |v|
-                                            v ? v.strip : v
-                                          }, default: :world, enum: %w[hello 42 world])
+      normalizer = ->(v) { v ? v.strip : v }
+      attribute(type: String, normalizer: normalizer, default: :world, enum: %w[hello 42 world])
     end
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq('world') }
@@ -42,9 +41,9 @@ describe Granite::Form::Model::Attributes::Attribute do
 
     context ':readonly' do
       specify do
-        expect(attribute(readonly: true, default: :world).tap do |r|
-                 r.write('string')
-               end.read_before_type_cast).to eq(:world)
+        attr = attribute(readonly: true, default: :world)
+        attr.write('string')
+        expect(attr.read_before_type_cast).to eq(:world)
       end
     end
   end
@@ -69,15 +68,15 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }
 
     specify do
-      expect(attribute(normalizer: [->(v) { v.strip }, lambda { |v|
-                                                         v.first(4)
-                                                       }]).normalize(' hello ')).to eq('hell')
+      normalizers = [->(v) { v.strip }, ->(v) { v.first(4) }]
+      attr = attribute(normalizer: normalizers)
+      expect(attr.normalize(' hello ')).to eq('hell')
     end
 
     specify do
-      expect(attribute(normalizer: [->(v) { v.first(4) }, lambda { |v|
-                                                            v.strip
-                                                          }]).normalize(' hello ')).to eq('hel')
+      normalizers = [->(v) { v.first(4) }, ->(v) { v.strip }]
+      attr = attribute(normalizer: normalizers)
+      expect(attr.normalize(' hello ')).to eq('hel')
     end
 
     context do

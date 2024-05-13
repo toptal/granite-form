@@ -90,9 +90,10 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
         before { user.projects = [other] }
 
         specify do
-          expect { user.projects.concat project }.to change {
-                                                       user.projects
-                                                     }.from([other]).to([other, project])
+          expect { user.projects.concat project }
+            .to change { user.projects }
+            .from([other])
+            .to([other, project])
         end
       end
     end
@@ -132,9 +133,9 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
       specify { expect(User.new.projects).to eq([]) }
 
       specify do
-        expect(User.new.tap do |u|
-                 u.projects.build(title: 'Project')
-               end.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded)
+        user = User.new
+        user.projects.build(title: 'Project')
+        expect(user.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded)
       end
 
       specify do

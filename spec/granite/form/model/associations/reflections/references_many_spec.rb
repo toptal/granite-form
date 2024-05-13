@@ -144,9 +144,10 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
 
       specify do
-        expect { book.owner_ids = [other.id] }.to change {
-                                                    book.owners
-                                                  }.from([an_instance_of(Author)]).to([other])
+        expect { book.owner_ids = [other.id] }
+          .to change { book.owners }
+          .from([an_instance_of(Author)])
+          .to([other])
       end
 
       specify { expect { book.owners = [] }.to change { book.owner_ids }.from([nil]).to([]) }

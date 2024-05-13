@@ -14,9 +14,8 @@ describe Granite::Form::Model::Attributes::Base do
 
   describe '#read' do
     let(:field) do
-      attribute(type: String, normalizer: lambda { |v|
-                                            v ? v.strip : v
-                                          }, default: :world, enum: %w[hello 42 world])
+      normalizer = ->(v) { v ? v.strip : v }
+      attribute(type: String, normalizer: normalizer, default: :world, enum: %w[hello 42 world])
     end
     let(:object) { Object.new }
 

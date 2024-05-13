@@ -197,9 +197,9 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     specify { expect(existing_association.target).to be_nil }
 
     specify do
-      expect { existing_association.replace(new_author) }.to change {
-                                                               existing_association.target
-                                                             }.to(an_instance_of(Author))
+      expect { existing_association.replace(new_author) }
+        .to change { existing_association.target }
+        .to(an_instance_of(Author))
     end
 
     specify { expect { existing_association.replace(nil) }.not_to(change { existing_association.target }) }

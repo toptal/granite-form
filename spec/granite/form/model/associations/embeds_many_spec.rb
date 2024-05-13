@@ -465,7 +465,8 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.concat([new_project1, new_project2]) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' },
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' },
+                                              { 'title' => 'Project 1' },
                                               { 'title' => 'Project 2' }])
     end
   end
