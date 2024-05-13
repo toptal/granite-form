@@ -68,15 +68,15 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }
 
     specify do
-      expect(attribute(normalizer: [->(v) { v.strip }, lambda { |v|
-                                                         v.first(4)
-                                                       }]).normalize(' hello ')).to eq('hell')
+      normalizers = [->(v) { v.strip }, ->(v) { v.first(4) }]
+      attr = attribute(normalizer: normalizers)
+      expect(attr.normalize(' hello ')).to eq('hell')
     end
 
     specify do
-      expect(attribute(normalizer: [->(v) { v.first(4) }, lambda { |v|
-                                                            v.strip
-                                                          }]).normalize(' hello ')).to eq('hel')
+      normalizers = [->(v) { v.first(4) }, ->(v) { v.strip }]
+      attr = attribute(normalizer: normalizers)
+      expect(attr.normalize(' hello ')).to eq('hel')
     end
 
     context do
