@@ -139,9 +139,9 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
       end
 
       specify do
-        expect(User.new.tap do |u|
-                 u.projects.build(title: 'Project')
-               end.projects).to match([have_attributes(title: 'Project')])
+        user = User.new
+        user.projects.build(title: 'Project')
+        expect(user.projects).to match([have_attributes(title: 'Project')])
       end
     end
 
