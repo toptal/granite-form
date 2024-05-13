@@ -22,7 +22,7 @@ module Granite
 
             def reference_key
               @reference_key ||= options[:reference_key].presence.try(:to_sym) ||
-                :"#{name.to_s.singularize}_#{primary_key.to_s.pluralize}"
+                                 :"#{name.to_s.singularize}_#{primary_key.to_s.pluralize}"
             end
           end
         end

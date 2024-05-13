@@ -25,19 +25,20 @@ describe Granite::Form::Model::Associations::EmbedsMany do
   let(:user) { User.new(name: 'User') }
   let(:association) { user.association(:projects) }
 
-  let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}] }
+  let(:existing_user) { User.instantiate name: 'Rick', projects: [{ title: 'Genesis' }] }
   let(:existing_association) { existing_user.association(:projects) }
 
   context 'callbacks' do
     before do
       User.class_eval do
         embeds_many :projects,
-          before_add: ->(object) { callbacks.push([:before_add, object]) },
-          after_add: ->(object) { callbacks.push([:after_add, object]) }
+                    before_add: ->(object) { callbacks.push([:before_add, object]) },
+                    after_add: ->(object) { callbacks.push([:after_add, object]) }
 
         collection :callbacks, Array
       end
     end
+
     let(:project1) { Project.new(title: 'Project1') }
     let(:project2) { Project.new(title: 'Project2') }
 
@@ -54,18 +55,18 @@ describe Granite::Form::Model::Associations::EmbedsMany do
       end
         .to change { user.callbacks }
         .to([
-          [:before_add, project1], [:after_add, project1],
-          [:before_add, project2], [:after_add, project2]
-        ])
+              [:before_add, project1], [:after_add, project1],
+              [:before_add, project2], [:after_add, project2]
+            ])
     end
 
     specify do
       expect { association.concat(project1, project2) }
         .to change { user.callbacks }
         .to([
-          [:before_add, project1], [:after_add, project1],
-          [:before_add, project2], [:after_add, project2]
-        ])
+              [:before_add, project1], [:after_add, project1],
+              [:before_add, project2], [:after_add, project2]
+            ])
     end
 
     specify do
@@ -75,18 +76,18 @@ describe Granite::Form::Model::Associations::EmbedsMany do
       end
         .to change { user.callbacks }
         .to([
-          [:before_add, project1], [:after_add, project1],
-          [:before_add, project2], [:after_add, project2]
-        ])
+              [:before_add, project1], [:after_add, project1],
+              [:before_add, project2], [:after_add, project2]
+            ])
     end
 
     specify do
       expect { association.writer([project2, project1]) }
         .to change { user.callbacks }
         .to([
-          [:before_add, project2], [:after_add, project2],
-          [:before_add, project1], [:after_add, project1]
-        ])
+              [:before_add, project2], [:after_add, project2],
+              [:before_add, project1], [:after_add, project1]
+            ])
     end
 
     specify do
@@ -97,18 +98,18 @@ describe Granite::Form::Model::Associations::EmbedsMany do
       end
         .to change { user.callbacks }
         .to([
-          [:before_add, project1], [:after_add, project1],
-          [:before_add, project2], [:after_add, project2]
-        ])
+              [:before_add, project1], [:after_add, project1],
+              [:before_add, project2], [:after_add, project2]
+            ])
     end
 
     context 'default' do
       before do
         User.class_eval do
           embeds_many :projects,
-            before_add: ->(owner, object) { owner.callbacks.push([:before_add, object]) },
-            after_add: ->(owner, object) { owner.callbacks.push([:after_add, object]) },
-            default: -> { {title: 'Project1'} }
+                      before_add: ->(owner, object) { owner.callbacks.push([:before_add, object]) },
+                      after_add: ->(owner, object) { owner.callbacks.push([:after_add, object]) },
+                      default: -> { { title: 'Project1' } }
 
           collection :callbacks, Array
         end
@@ -118,9 +119,9 @@ describe Granite::Form::Model::Associations::EmbedsMany do
         expect { association.concat(project2) }
           .to change { user.callbacks }
           .to([
-            [:before_add, project2], [:after_add, project2],
-            [:before_add, project1], [:after_add, project1]
-          ])
+                [:before_add, project2], [:after_add, project2],
+                [:before_add, project1], [:after_add, project1]
+              ])
       end
     end
   end
@@ -134,14 +135,17 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     let(:project) { Project.new(title: 'Project') }
 
     specify { expect(association.build.embedder).to eq(user) }
+
     specify do
       expect { association.writer([project]) }
         .to change { project.embedder }.from(nil).to(user)
     end
+
     specify do
       expect { association.concat(project) }
         .to change { project.embedder }.from(nil).to(user)
     end
+
     specify do
       expect { association.target = [project] }
         .to change { project.embedder }.from(nil).to(user)
@@ -150,7 +154,7 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     context 'default' do
       before do
         User.class_eval do
-          embeds_many :projects, default: -> { {title: 'Project1'} }
+          embeds_many :projects, default: -> { { title: 'Project1' } }
         end
       end
 
@@ -184,22 +188,24 @@ describe Granite::Form::Model::Associations::EmbedsMany do
 
     specify do
       expect { association.build(title: 'Swordfish') }
-        .not_to change { user.read_attribute(:projects) }
+        .not_to(change { user.read_attribute(:projects) })
     end
+
     specify do
       expect { association.build(title: 'Swordfish') }
         .to change { association.reader.map(&:attributes) }
-        .from([]).to([{'title' => 'Swordfish'}])
+        .from([]).to([{ 'title' => 'Swordfish' }])
     end
 
     specify do
       expect { existing_association.build(title: 'Swordfish') }
-        .not_to change { existing_user.read_attribute(:projects) }
+        .not_to(change { existing_user.read_attribute(:projects) })
     end
+
     specify do
       expect { existing_association.build(title: 'Swordfish') }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }])
     end
   end
 
@@ -210,27 +216,41 @@ describe Granite::Form::Model::Associations::EmbedsMany do
   end
 
   describe '#default' do
-    before { User.embeds_many :projects, default: -> { {title: 'Default'} } }
     before do
+      User.embeds_many :projects, default: -> { { title: 'Default' } }
       Project.class_eval do
         include Granite::Form::Model::Primary
         primary :title
       end
     end
+
     let(:new_project) { Project.new.tap { |p| p.title = 'Project' } }
     let(:existing_user) { User.instantiate name: 'Rick' }
 
     specify { expect(association.target.map(&:title)).to eq(['Default']) }
     specify { expect(association.target.map(&:new_record?)).to eq([true]) }
-    specify { expect { association.replace([new_project]) }.to change { association.target.map(&:title) }.to eq(['Project']) }
+
+    specify do
+      expect { association.replace([new_project]) }
+        .to change { association.target.map(&:title) }
+        .to eq(['Project'])
+    end
+
     specify { expect { association.replace([]) }.to change { association.target }.to([]) }
 
     specify { expect(existing_association.target).to eq([]) }
-    specify { expect { existing_association.replace([new_project]) }.to change { existing_association.target.map(&:title) }.to(['Project']) }
-    specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
+
+    specify do
+      expect { existing_association.replace([new_project]) }
+        .to change { existing_association.target.map(&:title) }
+        .to(['Project'])
+    end
+
+    specify { expect { existing_association.replace([]) }.not_to(change { existing_association.target }) }
 
     context do
-      before { Project.send(:include, Granite::Form::Model::Dirty) }
+      before { Project.include Granite::Form::Model::Dirty }
+
       specify { expect(association.target.any?(&:changed?)).to eq(false) }
     end
   end
@@ -250,18 +270,20 @@ describe Granite::Form::Model::Associations::EmbedsMany do
 
     context do
       before { association.build(title: 'Swordfish') }
+
       specify do
         expect { association.reload }
-          .to change { association.reader.map(&:attributes) }.from([{'title' => 'Swordfish'}]).to([])
+          .to change { association.reader.map(&:attributes) }.from([{ 'title' => 'Swordfish' }]).to([])
       end
     end
 
     context do
       before { existing_association.build(title: 'Swordfish') }
+
       specify do
         expect { existing_association.reload }
           .to change { existing_association.reader.map(&:attributes) }
-          .from([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]).to([{'title' => 'Genesis'}])
+          .from([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }]).to([{ 'title' => 'Genesis' }])
       end
     end
   end
@@ -270,7 +292,7 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     let!(:project) { association.build(title: 'Genesis') }
 
     specify do
-      expect { association.sync }.to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Genesis'}])
+      expect { association.sync }.to change { user.read_attribute(:projects) }.from(nil).to([{ 'title' => 'Genesis' }])
     end
 
     context 'when embedding is nested' do
@@ -288,19 +310,20 @@ describe Granite::Form::Model::Associations::EmbedsMany do
 
       specify do
         expect { association.sync }.to change { user.read_attribute(:projects) }
-          .from(nil).to([{'title' => 'Genesis', 'deadline' => {'enabled' => true}}])
+          .from(nil).to([{ 'title' => 'Genesis', 'deadline' => { 'enabled' => true } }])
       end
     end
   end
 
   describe '#clear' do
     specify { expect(association.clear).to eq(true) }
-    specify { expect { association.clear }.not_to change { association.reader } }
+    specify { expect { association.clear }.not_to(change { association.reader }) }
 
     specify { expect(existing_association.clear).to eq(true) }
+
     specify do
       expect { existing_association.clear }
-        .to change { existing_association.reader.map(&:attributes) }.from([{'title' => 'Genesis'}]).to([])
+        .to change { existing_association.reader.map(&:attributes) }.from([{ 'title' => 'Genesis' }]).to([])
     end
   end
 
@@ -312,6 +335,7 @@ describe Granite::Form::Model::Associations::EmbedsMany do
 
     context do
       before { association.build }
+
       specify { expect(association.reader.last).to be_a Project }
       specify { expect(association.reader.last).not_to be_persisted }
       specify { expect(association.reader.size).to eq(1) }
@@ -320,6 +344,7 @@ describe Granite::Form::Model::Associations::EmbedsMany do
 
     context do
       before { existing_association.build(title: 'Swordfish') }
+
       specify { expect(existing_association.reader.size).to eq(2) }
       specify { expect(existing_association.reader.last.title).to eq('Swordfish') }
       specify { expect(existing_association.reader(true).size).to eq(1) }
@@ -342,37 +367,46 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     specify { expect(association.writer([])).to eq([]) }
 
     specify { expect(association.writer([new_project1])).to eq([new_project1]) }
+
     specify do
       expect { association.writer([new_project1]) }
-        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
+        .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => 'Project 1' }])
     end
 
     specify do
       expect { existing_association.writer([new_project1, Dummy.new, new_project2]) }
         .to raise_error Granite::Form::AssociationTypeMismatch
     end
+
     specify do
-      expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer([new_project1, Dummy.new, new_project2]) } }
-        .not_to change { existing_association.reader }
+      expect do
+        muffle(Granite::Form::AssociationTypeMismatch) do
+          existing_association.writer([new_project1, Dummy.new, new_project2])
+        end
+      end
+        .not_to(change { existing_association.reader })
     end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
+
     specify do
       expect { muffle(NoMethodError) { existing_association.writer(nil) } }
-        .not_to change { existing_association.reader }
+        .not_to(change { existing_association.reader })
     end
 
     specify { expect(existing_association.writer([])).to eq([]) }
+
     specify do
       expect { existing_association.writer([]) }
         .to change { existing_association.reader }.to([])
     end
 
     specify { expect(existing_association.writer([new_project1, new_project2])).to eq([new_project1, new_project2]) }
+
     specify do
       expect { existing_association.writer([new_project1, new_project2]) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
     end
   end
 
@@ -392,39 +426,48 @@ describe Granite::Form::Model::Associations::EmbedsMany do
     specify { expect(existing_association.concat).to eq(existing_user.projects) }
 
     specify { expect(association.concat(new_project1)).to eq([new_project1]) }
+
     specify do
       expect { association.concat(new_project1) }
-        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
+        .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => 'Project 1' }])
     end
+
     specify do
       expect { association.concat(new_project1) }
-        .not_to change { user.read_attribute(:projects) }
+        .not_to(change { user.read_attribute(:projects) })
     end
 
     specify do
       expect { existing_association.concat(new_project1, invalid_project) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => nil}])
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }, { 'title' => nil }])
     end
 
     specify do
       expect { existing_association.concat(new_project1, Dummy.new, new_project2) }
         .to raise_error Granite::Form::AssociationTypeMismatch
     end
+
     specify do
-      expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.concat(new_project1, Dummy.new, new_project2) } }
+      expect do
+        muffle(Granite::Form::AssociationTypeMismatch) do
+          existing_association.concat(new_project1, Dummy.new, new_project2)
+        end
+      end
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}])
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }])
     end
 
     specify do
       expect(existing_association.concat(new_project1, new_project2))
         .to eq([existing_user.projects.first, new_project1, new_project2])
     end
+
     specify do
       expect { existing_association.concat([new_project1, new_project2]) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}])
+        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' },
+                                              { 'title' => 'Project 2' }])
     end
   end
 end

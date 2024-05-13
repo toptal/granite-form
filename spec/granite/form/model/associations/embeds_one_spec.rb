@@ -22,7 +22,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
   let(:book) { Book.new(title: 'Book') }
   let(:association) { book.association(:author) }
 
-  let(:existing_book) { Book.instantiate title: 'My Life', author: {'name' => 'Johny'} }
+  let(:existing_book) { Book.instantiate title: 'My Life', author: { 'name' => 'Johny' } }
   let(:existing_association) { existing_book.association(:author) }
 
   context 'callbacks' do
@@ -41,6 +41,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
         collection :callbacks, Array
       end
     end
+
     let(:author1) { Author.new(name: 'Author1') }
     let(:author2) { Author.new(name: 'Author2') }
 
@@ -57,9 +58,9 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       end
         .to change { book.callbacks }
         .to([
-          [:before_add, author1], [:after_add, author1],
-          [:before_add, author2], [:after_add, author2]
-        ])
+              [:before_add, author1], [:after_add, author1],
+              [:before_add, author2], [:after_add, author2]
+            ])
     end
 
     specify do
@@ -76,18 +77,18 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       end
         .to change { book.callbacks }
         .to([
-          [:before_add, author1], [:after_add, author1],
-          [:before_add, author1], [:after_add, author1]
-        ])
+              [:before_add, author1], [:after_add, author1],
+              [:before_add, author1], [:after_add, author1]
+            ])
     end
 
     context 'default' do
       before do
         Book.class_eval do
           embeds_one :author,
-            before_add: ->(object) { callbacks.push([:before_add, object]) },
-            after_add: ->(object) { callbacks.push([:after_add, object]) },
-            default: -> { {name: 'Author1'} }
+                     before_add: ->(object) { callbacks.push([:before_add, object]) },
+                     after_add: ->(object) { callbacks.push([:after_add, object]) },
+                     default: -> { { name: 'Author1' } }
 
           collection :callbacks, Array
         end
@@ -97,9 +98,9 @@ describe Granite::Form::Model::Associations::EmbedsOne do
         expect { association.writer(author2) }
           .to change { book.callbacks }
           .to([
-            [:before_add, author1], [:after_add, author1],
-            [:before_add, author2], [:after_add, author2]
-          ])
+                [:before_add, author1], [:after_add, author1],
+                [:before_add, author2], [:after_add, author2]
+              ])
       end
     end
   end
@@ -113,10 +114,12 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     let(:author) { Author.new(name: 'Author') }
 
     specify { expect(association.build.embedder).to eq(book) }
+
     specify do
       expect { association.writer(author) }
         .to change { author.embedder }.from(nil).to(book)
     end
+
     specify do
       expect { association.target = author }
         .to change { author.embedder }.from(nil).to(book)
@@ -125,7 +128,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     context 'default' do
       before do
         Book.class_eval do
-          embeds_one :author, default: -> { {name: 'Author1'} }
+          embeds_one :author, default: -> { { name: 'Author1' } }
         end
       end
 
@@ -159,12 +162,12 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
     specify do
       expect { association.build(name: 'Fred') }
-        .not_to change { book.read_attribute(:author) }
+        .not_to(change { book.read_attribute(:author) })
     end
 
     specify do
       expect { existing_association.build(name: 'Fred') }
-        .not_to change { existing_book.read_attribute(:author) }
+        .not_to(change { existing_book.read_attribute(:author) })
     end
   end
 
@@ -175,13 +178,14 @@ describe Granite::Form::Model::Associations::EmbedsOne do
   end
 
   describe '#default' do
-    before { Book.embeds_one :author, default: -> { {name: 'Default'} } }
     before do
+      Book.embeds_one :author, default: -> { { name: 'Default' } }
       Author.class_eval do
         include Granite::Form::Model::Primary
         primary :name
       end
     end
+
     let(:new_author) { Author.new.tap { |a| a.name = 'Morty' } }
     let(:existing_book) { Book.instantiate title: 'My Life' }
 
@@ -191,11 +195,18 @@ describe Granite::Form::Model::Associations::EmbedsOne do
     specify { expect { association.replace(nil) }.to change { association.target }.to be_nil }
 
     specify { expect(existing_association.target).to be_nil }
-    specify { expect { existing_association.replace(new_author) }.to change { existing_association.target }.to(an_instance_of(Author)) }
-    specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
+
+    specify do
+      expect { existing_association.replace(new_author) }.to change {
+                                                               existing_association.target
+                                                             }.to(an_instance_of(Author))
+    end
+
+    specify { expect { existing_association.replace(nil) }.not_to(change { existing_association.target }) }
 
     context do
-      before { Author.send(:include, Granite::Form::Model::Dirty) }
+      before { Author.include Granite::Form::Model::Dirty }
+
       specify { expect(association.target).not_to be_changed }
     end
   end
@@ -220,6 +231,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
     context do
       before { association.build(name: 'Fred') }
+
       specify do
         expect { association.reload }
           .to change { association.reader.try(:attributes) }.from('name' => 'Fred').to(nil)
@@ -228,6 +240,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
     context do
       before { existing_association.build(name: 'Fred') }
+
       specify do
         expect { existing_association.reload }
           .to change { existing_association.reader.try(:attributes) }
@@ -256,16 +269,17 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
       specify do
         expect { association.sync }.to change { book.read_attribute(:author) }
-          .from(nil).to('name' => 'Fred', 'reviews' => [{'rating' => 7}])
+          .from(nil).to('name' => 'Fred', 'reviews' => [{ 'rating' => 7 }])
       end
     end
   end
 
   describe '#clear' do
     specify { expect(association.clear).to eq(true) }
-    specify { expect { association.clear }.not_to change { association.reader } }
+    specify { expect { association.clear }.not_to(change { association.reader }) }
 
     specify { expect(existing_association.clear).to eq(true) }
+
     specify do
       expect { existing_association.clear }
         .to change { existing_association.reader.try(:attributes) }.from('name' => 'Johny').to(nil)
@@ -280,6 +294,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
     context do
       before { association.build }
+
       specify { expect(association.reader).to be_a Author }
       specify { expect(association.reader).not_to be_persisted }
       specify { expect(association.reader(true)).to be_nil }
@@ -287,6 +302,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
     context do
       before { existing_association.build(name: 'Fred') }
+
       specify { expect(existing_association.reader.name).to eq('Fred') }
       specify { expect(existing_association.reader(true).name).to eq('Johny') }
     end
@@ -305,8 +321,9 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
       specify do
         expect { association.writer(nil) }
-          .not_to change { book.read_attribute(:author) }
+          .not_to(change { book.read_attribute(:author) })
       end
+
       specify do
         expect { association.writer(new_author) }
           .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty')
@@ -321,6 +338,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
 
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }
+
       specify do
         expect { association.writer(new_author) }
           .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty')
@@ -332,12 +350,17 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       end
 
       specify do
-        expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer(stub_model(:dummy).new) } }
-          .not_to change { existing_association.reader }
+        expect do
+          muffle(Granite::Form::AssociationTypeMismatch) do
+            existing_association.writer(stub_model(:dummy).new)
+          end
+        end
+          .not_to(change { existing_association.reader })
       end
 
       specify { expect(existing_association.writer(nil)).to be_nil }
       specify { expect(existing_association.writer(new_author)).to eq(new_author) }
+
       specify do
         expect { existing_association.writer(new_author) }
           .to change { existing_association.reader.try(:attributes) }

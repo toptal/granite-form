@@ -38,16 +38,18 @@ describe Granite::Form::Model::Associations::Validations do
     let(:project) { Project.new title: 'Project' }
     let(:projects) { [project] }
     let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
-    let(:author_attributes) { {name: 'Author'} }
+    let(:author_attributes) { { name: 'Author' } }
+
     before { project.build_author(author_attributes) }
 
     specify { expect(user.validate).to eq(true) }
-    specify { expect { user.validate }.not_to change { user.errors.messages } }
+    specify { expect { user.validate }.not_to(change { user.errors.messages }) }
 
     context do
       let(:author_attributes) { {} }
 
       specify { expect(user.validate).to eq(false) }
+
       specify do
         expect { user.validate }.to change { user.errors.messages }
           .to('projects.0.author.name': ["can't be blank"])
@@ -58,13 +60,14 @@ describe Granite::Form::Model::Associations::Validations do
       let(:profile) { Profile.new }
 
       specify { expect(user.validate).to eq(true) }
-      specify { expect { user.validate }.not_to change { user.errors.messages } }
+      specify { expect { user.validate }.not_to(change { user.errors.messages }) }
     end
 
     context do
       let(:projects) { [project, Project.new] }
 
       specify { expect(user.validate).to eq(false) }
+
       specify do
         expect { user.validate }.to change { user.errors.messages }
           .to('projects.1.title': ["can't be blank"])
@@ -77,7 +80,8 @@ describe Granite::Form::Model::Associations::Validations do
     let(:project) { Project.new title: 'Project' }
     let(:projects) { [project] }
     let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
-    let(:author_attributes) { {name: 'Author'} }
+    let(:author_attributes) { { name: 'Author' } }
+
     before { project.build_author(author_attributes) }
 
     specify { expect(user.validate_ancestry).to eq(true) }
@@ -85,14 +89,16 @@ describe Granite::Form::Model::Associations::Validations do
     specify { expect { user.validate_ancestry! }.not_to raise_error }
     specify { expect(user.valid_ancestry?).to eq(true) }
     specify { expect(user.invalid_ancestry?).to eq(false) }
-    specify { expect { user.validate_ancestry }.not_to change { user.errors.messages } }
+    specify { expect { user.validate_ancestry }.not_to(change { user.errors.messages }) }
 
     context do
       let(:author_attributes) { {} }
+
       specify { expect(user.validate_ancestry).to eq(false) }
       specify { expect { user.validate_ancestry! }.to raise_error Granite::Form::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
+
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
           .to('projects.0.author.name': ["can't be blank"])
@@ -101,10 +107,12 @@ describe Granite::Form::Model::Associations::Validations do
 
     context do
       let(:profile) { Profile.new }
+
       specify { expect(user.validate_ancestry).to eq(false) }
       specify { expect { user.validate_ancestry! }.to raise_error Granite::Form::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
+
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
           .to('profile.first_name': ["can't be blank"])
@@ -113,10 +121,12 @@ describe Granite::Form::Model::Associations::Validations do
 
     context do
       let(:projects) { [project, Project.new] }
+
       specify { expect(user.validate_ancestry).to eq(false) }
       specify { expect { user.validate_ancestry! }.to raise_error Granite::Form::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
+
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
           .to('projects.1.title': ["can't be blank"])
@@ -124,6 +134,7 @@ describe Granite::Form::Model::Associations::Validations do
 
       context do
         before { user.update(login: '') }
+
         specify do
           expect { user.validate_ancestry }.to change { user.errors.messages }
             .to('projects.1.title': ["can't be blank"], login: ["can't be blank"])

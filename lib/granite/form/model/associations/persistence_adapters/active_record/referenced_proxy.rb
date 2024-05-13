@@ -9,6 +9,7 @@ module Granite
               METHODS_EXCLUDED_FROM_DELEGATION = %w[build create create!].map(&:to_sym).freeze
 
               attr_reader :association
+
               delegate :scope, to: :@association
 
               def method_missing(method, *args, &block)
@@ -19,7 +20,7 @@ module Granite
                 delegate_to_scope?(method) || super
               end
 
-            private
+              private
 
               def delegate_to_scope?(method)
                 METHODS_EXCLUDED_FROM_DELEGATION.exclude?(method) && scope.respond_to?(method)

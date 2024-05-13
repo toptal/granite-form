@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class Time < Object
-      private
+        private
 
         def typecast(value)
           value.is_a?(::String) && ::Time.zone ? ::Time.zone.parse(value) : value.try(:to_time)

@@ -42,7 +42,7 @@ module Granite
             end
           end
 
-          alias_method :writer, :replace
+          alias writer replace
 
           def concat(*objects)
             append objects.flatten
@@ -60,12 +60,13 @@ module Granite
             target.map { |obj| reflection.persistence_adapter.identify(obj) }
           end
 
-        private
+          private
 
           def append(objects)
             attribute.pollute do
               objects.each do |object|
                 next if target.include?(object)
+
                 raise_type_mismatch(object) unless matches_type?(object)
 
                 target.push(object)

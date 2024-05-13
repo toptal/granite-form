@@ -5,7 +5,7 @@ module Granite
     module Types
       module ActiveSupport
         class TimeZone < Float
-        private
+          private
 
           def typecast(value)
             case value

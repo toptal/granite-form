@@ -18,6 +18,7 @@ describe Granite::Form::Model::Representation do
         alias_attribute :r, :rate
       end
     end
+
     let(:author) { Author.new(rate: '42') }
     let(:foos) { %w[foo bar] }
 
@@ -33,12 +34,13 @@ describe Granite::Form::Model::Representation do
     specify { expect(Post.new.rate).to be_nil }
     specify { expect(Post.new.rate_before_type_cast).to be_nil }
 
-    if ActiveModel.version >= Gem::Version.new('7.0.0') # rubocop:disable Style/IfUnlessModifier
+    if ActiveModel.version >= Gem::Version.new('7.0.0')
       specify { expect { Post.new(foo_container: FooContainer.new, foos: foos) }.not_to raise_exception }
     end
 
     context 'ActionController::Parameters' do
-      let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: {rate: '33', author: author}) }
+      let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: { rate: '33', author: author }) }
+
       specify { expect { Post.new(params) }.not_to raise_error }
     end
 
@@ -71,6 +73,7 @@ describe Granite::Form::Model::Representation do
           represents :name, of: :a
         end
       end
+
       let!(:author) { Author.create!(name: 42) }
 
       specify { expect(Post.reflect_on_attribute(:name).reference).to eq('author') }
@@ -136,13 +139,13 @@ describe Granite::Form::Model::Representation do
     if ActiveModel.version >= Gem::Version.new('6.1.0')
       specify do
         expect { post.validate }.to change { post.errors.details }
-          .to('author.user.email': [{error: 'is invalid'}], name: [{error: :blank}])
+          .to('author.user.email': [{ error: 'is invalid' }], name: [{ error: :blank }])
       end
     end
 
     context 'when using symbol in error message of represented model' do
       before do
-        Author.validates :name, inclusion: {in: ['Author'], message: :invalid_name, allow_blank: true}
+        Author.validates :name, inclusion: { in: ['Author'], message: :invalid_name, allow_blank: true }
         post.author.name = 'Not Author'
       end
 

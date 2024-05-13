@@ -3,6 +3,7 @@ module Granite
     module Types
       class HasSubtype
         attr_reader :subtype_definition
+
         delegate :reflection, :owner, :type, :name, :enum, to: :subtype_definition
 
         def initialize(subtype_definition)

@@ -24,7 +24,7 @@ module Granite
             end
           end
 
-        private
+          private
 
           def reference
             owner.__send__(reflection.reference)

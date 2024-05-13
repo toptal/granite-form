@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class Array < Object
-      private
+        private
 
         def typecast(value)
           if value.is_a?(::String)

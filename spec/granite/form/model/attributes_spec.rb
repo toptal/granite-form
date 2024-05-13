@@ -37,28 +37,33 @@ describe Granite::Form::Model::Attributes do
   describe '.inspect' do
     specify { expect(stub_model.inspect).to match(/#<Class:0x\w+>\(no attributes\)/) }
     specify { expect(stub_model(:user).inspect).to eq('User(no attributes)') }
+
     specify do
       expect(stub_model do
                include Granite::Form::Model::Primary
                primary :count, Integer
                attribute :object, Object
-             end.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/) end
+             end.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/)
+    end
+
     specify do
       expect(stub_model(:user) do
                include Granite::Form::Model::Primary
                primary :count, Integer
                attribute :object, Object
-             end.inspect).to match('User(*count: Integer, object: Object)') end
+             end.inspect).to match('User(*count: Integer, object: Object)')
+    end
   end
 
   describe '#==' do
+    subject { model.new name: 'hello', count: 42 }
+
     let(:model) do
       stub_model do
         attribute :name, String
         attribute :count, Float, default: 0
       end
     end
-    subject { model.new name: 'hello', count: 42 }
 
     it { is_expected.not_to eq(nil) }
     it { is_expected.not_to eq('hello') }
@@ -79,6 +84,7 @@ describe Granite::Form::Model::Attributes do
 
   describe '#attribute' do
     let(:instance) { model.new }
+
     specify { expect(instance.attribute(:full_name).reflection.name).to eq('full_name') }
     specify { expect(instance.attribute('full_name').reflection.name).to eq('full_name') }
     specify { expect(instance.attribute(:name).reflection.name).to eq('full_name') }
@@ -108,10 +114,12 @@ describe Granite::Form::Model::Attributes do
 
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({}) }
+
     specify do
       expect(model.new(name: 'Name').attributes)
         .to match('id' => nil, 'full_name' => 'Name', 'author' => nil, 'projects' => nil)
     end
+
     specify do
       expect(model.new(name: 'Name').attributes(false))
         .to match('id' => nil, 'full_name' => 'Name')
@@ -119,13 +127,16 @@ describe Granite::Form::Model::Attributes do
   end
 
   describe '#assign_attributes' do
-    let(:attributes) { {id: 42, full_name: 'Name', missed: 'value'} }
     subject { model.new }
+
+    let(:attributes) { { id: 42, full_name: 'Name', missed: 'value' } }
 
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.id }.to(42) }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.full_name }.to('Name') }
 
     context 'features stack and assign order' do
+      subject { model.new }
+
       let(:model) do
         stub_model do
           attr_reader :logger
@@ -147,7 +158,6 @@ describe Granite::Form::Model::Attributes do
           log(:plain2)
         end
       end
-      subject { model.new }
 
       specify do
         expect { subject.assign_attributes(plain1: 'value', plain2: 'value') }
@@ -176,18 +186,22 @@ describe Granite::Form::Model::Attributes do
             log(:assoc_plain)
 
             def assign_attributes(attrs)
-              super attrs.merge(attrs.extract!('plain2'))
+              super(attrs.merge(attrs.extract!('plain2')))
             end
           end
         end
 
         specify do
-          expect { subject.assign_attributes(assoc_plain: 'value', assoc_attributes: {}, plain1: 'value', plain2: 'value') }
+          expect do
+            subject.assign_attributes(assoc_plain: 'value', assoc_attributes: {}, plain1: 'value', plain2: 'value')
+          end
             .to change { subject.logger }.to(%i[plain1 assoc_attributes assoc_plain plain2])
         end
 
         specify do
-          expect { subject.assign_attributes(plain1: 'value', plain2: 'value', assoc_plain: 'value', assoc_attributes: {}) }
+          expect do
+            subject.assign_attributes(plain1: 'value', plain2: 'value', assoc_plain: 'value', assoc_attributes: {})
+          end
             .to change { subject.logger }.to(%i[plain1 assoc_attributes assoc_plain plain2])
         end
       end
@@ -212,7 +226,7 @@ describe Granite::Form::Model::Attributes do
 
     let(:author) { Author.new }
     let(:model) { Model.new(attributes) }
-    let(:attributes) { {author: author, name: 'Author Name', full_name: nil, age: 25} }
+    let(:attributes) { { author: author, name: 'Author Name', full_name: nil, age: 25 } }
 
     it { expect { model.sync_attributes }.to change(author, :name).to('Author Name') }
 
@@ -226,21 +240,27 @@ describe Granite::Form::Model::Attributes do
   describe '#inspect' do
     specify { expect(stub_model.new.inspect).to match(/#<#<Class:0x\w+> \(no attributes\)>/) }
     specify { expect(stub_model(:user).new.inspect).to match(/#<User \(no attributes\)>/) }
+
     specify do
       expect(stub_model do
                include Granite::Form::Model::Primary
                primary :count, Integer
                attribute :object, Object
-             end.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/) end
+             end.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/)
+    end
+
     specify do
       expect(stub_model(:user) do
                include Granite::Form::Model::Primary
                primary :count, Integer
                attribute :object, Object
-             end.new.inspect).to match(/#<User \*count: nil, object: nil>/) end
+             end.new.inspect).to match(/#<User \*count: nil, object: nil>/)
+    end
   end
 
   context 'attributes integration' do
+    subject { model.new('world') }
+
     let(:model) do
       stub_class do
         include Granite::Form::Util
@@ -257,9 +277,10 @@ describe Granite::Form::Model::Attributes do
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: '2'
         attribute :foo, Boolean, default: false
         collection :array, Integer, enum: [1, 2, 3], default: [2], normalizer: ->(v) { v.uniq }
-        dictionary :dict, Integer, keys: %w[from to], enum: [1, 2, 3], default: {from: 1}, normalizer: proc { |v|
+        dictionary :dict, Integer, keys: %w[from to], enum: [1, 2, 3], default: { from: 1 }, normalizer: proc { |v|
           next v if v[:from].nil? || v[:to].nil? || v[:from] <= v[:to]
-          {from: v[:to], to: v[:from]}.with_indifferent_access
+
+          { from: v[:to], to: v[:from] }.with_indifferent_access
         }
 
         def initialize(name = nil)
@@ -269,21 +290,19 @@ describe Granite::Form::Model::Attributes do
       end
     end
 
-    subject { model.new('world') }
-
-    its(:enum_values) { should == [1, 2, 3] }
-    its(:string_default) { should == 'world' }
-    its(:count_default) { should == '10' }
-    its(:name) { should == 'world' }
-    its(:hello) { should eq(nil) }
-    its(:hello?) { should eq(false) }
-    its(:count) { should == 10 }
-    its(:count_before_type_cast) { should == '10' }
-    its(:count_came_from_user?) { should eq(false) }
-    its(:count?) { should eq(true) }
-    its(:calc) { should == 5 }
-    its(:enum?) { should eq(false) }
-    its(:enum_with_default?) { should eq(true) }
+    its(:enum_values) { is_expected.to eq [1, 2, 3] }
+    its(:string_default) { is_expected.to eq 'world' }
+    its(:count_default) { is_expected.to eq '10' }
+    its(:name) { is_expected.to eq 'world' }
+    its(:hello) { is_expected.to eq(nil) }
+    its(:hello?) { is_expected.to eq(false) }
+    its(:count) { is_expected.to eq 10 }
+    its(:count_before_type_cast) { is_expected.to eq '10' }
+    its(:count_came_from_user?) { is_expected.to eq(false) }
+    its(:count?) { is_expected.to eq(true) }
+    its(:calc) { is_expected.to eq 5 }
+    its(:enum?) { is_expected.to eq(false) }
+    its(:enum_with_default?) { is_expected.to eq(true) }
     specify { expect { subject.hello = 'worlds' }.to change { subject.hello }.from(nil).to('worlds') }
     specify { expect { subject.count = 20 }.to change { subject.count }.from(10).to(20) }
     specify { expect { subject.calc = 15 }.to change { subject.calc }.from(5).to(15) }
@@ -294,22 +313,27 @@ describe Granite::Form::Model::Attributes do
         subject.enum = 3
         expect(subject.enum).to eq(3)
       end
+
       specify do
         subject.enum = '3'
         expect(subject.enum).to eq(3)
       end
+
       specify do
         subject.enum = 10
         expect(subject.enum).to eq(nil)
       end
+
       specify do
         subject.enum = 'hello'
         expect(subject.enum).to eq(nil)
       end
+
       specify do
         subject.enum_with_default = 3
         expect(subject.enum_with_default).to eq(3)
       end
+
       specify do
         subject.enum_with_default = 10
         expect(subject.enum_with_default).to be_nil
@@ -349,21 +373,49 @@ describe Granite::Form::Model::Attributes do
 
       specify do
         expect(subject).to have_attributes(
-          dict: {from: 1},
-          dict_before_type_cast: {from: 1},
+          dict: { from: 1 },
+          dict_before_type_cast: { from: 1 },
           dict?: true,
-          dict_default: {from: 1},
+          dict_default: { from: 1 },
           dict_values: [1, 2, 3]
         )
       end
 
-      specify { with_assigned_value(nil).to have_attributes(dict: {'from' => 1}, dict_before_type_cast: {from: 1}) }
+      specify { with_assigned_value(nil).to have_attributes(dict: { 'from' => 1 }, dict_before_type_cast: { from: 1 }) }
       specify { with_assigned_value([nil]).to have_attributes(dict: {}, dict_before_type_cast: [nil]) }
       specify { with_assigned_value(1).to have_attributes(dict: {}, dict_before_type_cast: 1) }
-      specify { with_assigned_value(from: 1, to: 2).to have_attributes(dict: {'from' => 1, 'to' => 2}, dict_before_type_cast: {from: 1, to: 2}) }
-      specify { with_assigned_value(from: 2, to: 4).to have_attributes(dict: {'from' => 2, 'to' => nil}, dict_before_type_cast: {from: 2, to: 4}) }
-      specify { with_assigned_value(from: '1', to: '2').to have_attributes(dict: {'from' => 1, 'to' => 2}, dict_before_type_cast: {from: '1', to: '2'}) }
-      specify { with_assigned_value(from: 3, to: 1).to have_attributes(dict: {'from' => 1, 'to' => 3}, dict_before_type_cast: {from: 3, to: 1}) }
+
+      specify do
+        with_assigned_value(from: 1,
+                            to: 2).to have_attributes(dict: { 'from' => 1, 'to' => 2 },
+                                                      dict_before_type_cast: {
+                                                        from: 1, to: 2
+                                                      })
+      end
+
+      specify do
+        with_assigned_value(from: 2,
+                            to: 4).to have_attributes(dict: { 'from' => 2, 'to' => nil },
+                                                      dict_before_type_cast: {
+                                                        from: 2, to: 4
+                                                      })
+      end
+
+      specify do
+        with_assigned_value(from: '1',
+                            to: '2').to have_attributes(dict: { 'from' => 1, 'to' => 2 },
+                                                        dict_before_type_cast: {
+                                                          from: '1', to: '2'
+                                                        })
+      end
+
+      specify do
+        with_assigned_value(from: 3,
+                            to: 1).to have_attributes(dict: { 'from' => 1, 'to' => 3 },
+                                                      dict_before_type_cast: {
+                                                        from: 3, to: 1
+                                                      })
+      end
     end
 
     context 'attribute caching' do

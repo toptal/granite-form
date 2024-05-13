@@ -22,7 +22,7 @@ module Granite
                 attrs = attrs.stringify_keys
 
                 nested_attrs = self.class.nested_attributes_options.keys
-                  .each_with_object({}) do |association_name, result|
+                                   .each_with_object({}) do |association_name, result|
                   name = "#{association_name}_attributes"
                   result[name] = attrs.delete(name) if attrs.key?(name)
                 end
@@ -33,14 +33,18 @@ module Granite
               end
             end
 
-            alias_method :attributes=, :assign_attributes
+            alias attributes= assign_attributes
           end
 
-          class NestedAttributesMethods
-            REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |key, value| key == DESTROY_ATTRIBUTE || value.blank? } }
+          class NestedAttributesMethods # rubocop:disable Metrics/ClassLength
+            REJECT_ALL_BLANK_PROC = proc { |attributes|
+              attributes.all? do |key, value|
+                key == DESTROY_ATTRIBUTE || value.blank?
+              end
+            }
 
             def self.accepts_nested_attributes_for(klass, *attr_names)
-              options = {allow_destroy: false, update_only: false}
+              options = { allow_destroy: false, update_only: false }
               options.update(attr_names.extract_options!)
               options.assert_valid_keys(:allow_destroy, :reject_if, :limit, :update_only)
               options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
@@ -49,10 +53,18 @@ module Granite
 
               attr_names.each do |association_name|
                 reflection = klass.reflect_on_association(association_name)
-                raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?" unless reflection
-                klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
+                unless reflection
+                  raise ArgumentError,
+                        "No association found for name `#{association_name}'. Has it been defined yet?"
+                end
 
-                should_validate_nested = klass.respond_to?(:validates_nested) && !klass.validates_nested?(association_name)
+                klass.nested_attributes_options =
+                  klass
+                  .nested_attributes_options
+                  .merge(association_name.to_sym => options)
+
+                should_validate_nested = klass.respond_to?(:validates_nested) &&
+                                         !klass.validates_nested?(association_name)
                 klass.validates_nested(association_name) if should_validate_nested
 
                 type = (reflection.collection? ? :collection : :one_to_one)
@@ -74,10 +86,17 @@ module Granite
               primary_attribute_name = primary_name_for(association.reflection.klass)
               if existing_record
                 primary_attribute = existing_record.attribute(primary_attribute_name)
-                primary_attribute_value = primary_attribute.type_definition.prepare(attributes[primary_attribute_name]) if primary_attribute
+                if primary_attribute
+                  primary_attribute_value = primary_attribute.type_definition
+                                                             .prepare(attributes[primary_attribute_name])
+                end
               end
 
-              if existing_record && (!primary_attribute || options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
+              should_assign = !primary_attribute ||
+                              options[:update_only] ||
+                              existing_record.primary_attribute == primary_attribute_value
+
+              if existing_record && should_assign
                 assign_to(existing_record, attributes) unless call_reject_if(object, association_name, attributes)
                 association.clear if destroy_flag?(attributes) && options[:allow_destroy]
               elsif attributes[primary_attribute_name].present?
@@ -93,11 +112,12 @@ module Granite
               end
             end
 
-            def self.assign_nested_attributes_for_collection_association(object, association_name, attributes_collection)
+            def self.assign_nested_attributes_for_collection_association(object, association_name, attributes_collection) # rubocop:disable Layout/LineLength,Metrics/MethodLength
               options = object.nested_attributes_options[association_name]
 
               unless attributes_collection.is_a?(Hash) || attributes_collection.is_a?(Array)
-                raise ArgumentError, "Hash or Array expected, got #{attributes_collection.class.name} (#{attributes_collection.inspect})"
+                raise ArgumentError,
+                      "Hash or Array expected, got #{attributes_collection.class.name} (#{attributes_collection.inspect})" # rubocop:disable Layout/LineLength
               end
 
               check_record_limit!(options[:limit], attributes_collection)
@@ -105,26 +125,32 @@ module Granite
               association = object.association(association_name)
               primary_attribute_name = primary_name_for(association.reflection.klass)
 
-              raise Granite::Form::UndefinedPrimaryAttribute.new(object.class, association_name) unless primary_attribute_name
+              unless primary_attribute_name
+                raise Granite::Form::UndefinedPrimaryAttribute.new(object.class,
+                                                                   association_name)
+              end
 
               if attributes_collection.is_a? Hash
                 keys = attributes_collection.keys
-                attributes_collection = if keys.include?(primary_attribute_name) || keys.include?(primary_attribute_name.to_sym)
-                  [attributes_collection]
-                else
-                  attributes_collection.values
-                end
+                attributes_collection =
+                  if keys.include?(primary_attribute_name) || keys.include?(primary_attribute_name.to_sym)
+                    [attributes_collection]
+                  else
+                    attributes_collection.values
+                  end
               end
 
               attributes_collection.each do |attributes|
                 attributes = attributes.with_indifferent_access
 
                 if attributes[primary_attribute_name].blank?
-                  association.build(attributes.except(*unassignable_keys(object))) unless reject_new_object?(object, association_name, attributes, options)
+                  association.build(attributes.except(*unassignable_keys(object))) unless reject_new_object?(
+                    object, association_name, attributes, options
+                  )
                 else
                   existing_record = association.target.detect do |record|
                     primary_attribute_value = record.attribute(primary_attribute_name)
-                      .type_definition.prepare(attributes[primary_attribute_name])
+                                                    .type_definition.prepare(attributes[primary_attribute_name])
                     record.primary_attribute == primary_attribute_value
                   end
                   if existing_record
@@ -137,7 +163,8 @@ module Granite
                       end
                     end
                   else
-                    raise Granite::Form::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
+                    raise Granite::Form::ObjectNotFound.new(object, association_name,
+                                                            attributes[primary_attribute_name])
                   end
                 end
               end
@@ -145,13 +172,13 @@ module Granite
 
             def self.check_record_limit!(limit, attributes_collection)
               limit = case limit
-              when Symbol
-                send(limit)
-              when Proc
-                limit.call
-              else
-                limit
-              end
+                      when Symbol
+                        send(limit)
+                      when Proc
+                        limit.call
+                      else
+                        limit
+                      end
 
               return unless limit && attributes_collection.size > limit
 
@@ -197,15 +224,16 @@ module Granite
           module NestedAttributesMethodsExtension
             def self.ensure_extended!(klass)
               return if klass.singleton_class.ancestors.include?(self)
+
               klass.extend(self)
             end
 
             def nested_attributes_methods_module
               @nested_attributes_methods_module ||= begin
-                                                      mod = const_set(:NestedAttributesMethods, Module.new)
-                                                      include(mod)
-                                                      mod
-                                                    end
+                mod = const_set(:NestedAttributesMethods, Module.new)
+                include(mod)
+                mod
+              end
             end
           end
         end

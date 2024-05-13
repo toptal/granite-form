@@ -17,7 +17,8 @@ else
         end
 
         def self.parse_string(value)
-          return nil if value.length.zero?
+          return nil if value.empty?
+
           if value.length == 36
             parse value
           elsif value.length == 32

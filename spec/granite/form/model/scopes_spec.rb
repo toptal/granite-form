@@ -9,14 +9,14 @@ describe Granite::Form::Model::Scopes do
 
       class << self
         def except_first
-          scope[1..-1]
+          scope[1..]
         end
 
         def no_mars
           scope.delete_if { |i| i.name == 'Mars' }
         end
 
-      private
+        private
 
         def hidden_method() end
       end
@@ -45,7 +45,12 @@ describe Granite::Form::Model::Scopes do
       let(:scope) { model.scope([model.new(name: 'Hello'), model.new(name: 'World'), model.new(name: 'Mars')]) }
 
       specify { expect(scope).to be_instance_of model.scope_class }
-      specify { expect { model.scope([model.new(name: 'Hello'), {}]) }.to raise_error Granite::Form::AssociationTypeMismatch }
+
+      specify do
+        expect do
+          model.scope([model.new(name: 'Hello'), {}])
+        end.to raise_error Granite::Form::AssociationTypeMismatch
+      end
 
       context 'scopes' do
         specify { expect(scope.except_first).to be_instance_of model.scope_class }

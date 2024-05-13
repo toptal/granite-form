@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class Float < Object
-      private
+        private
 
         def typecast(value)
           Float(value)

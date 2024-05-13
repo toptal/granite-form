@@ -4,6 +4,7 @@ module Granite
       module Associations
         class Base
           attr_accessor :owner, :reflection
+
           delegate :macro, :collection?, to: :reflection
 
           def initialize(owner, reflection)
@@ -33,6 +34,7 @@ module Granite
 
           def target
             return @target if loaded?
+
             self.target = load_target
           end
 
@@ -66,10 +68,12 @@ module Granite
           end
 
           def inspect
-            "#<#{reflection.macro.to_s.camelize} #{target.inspect.truncate(50, omission: collection? ? '...]' : '...')}>"
+            macro = reflection.macro.to_s.camelize
+            target_for_inspect = target.inspect.truncate(50, omission: collection? ? '...]' : '...')
+            "#<#{macro} #{target_for_inspect}>"
           end
 
-        private
+          private
 
           def read_source
             reflection.read_source owner

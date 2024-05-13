@@ -32,7 +32,7 @@ module Granite
             @value_cache
           end
 
-        private
+          private
 
           def association
             @association ||= owner.association(reflection.association)

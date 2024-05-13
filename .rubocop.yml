@@ -1,64 +1,42 @@
 inherit_from: .rubocop_todo.yml
 
+require:
+  - rubocop-rspec
+
 AllCops:
+  Include:
+    - '**/*.rb'
+    - '**/Gemfile'
+    - '**/Rakefile'
+  Exclude:
+    - 'vendor/bundle/**/*'
+    - 'log/**/*'
+    - 'spec/fixtures/**/*'
+    - 'lib/granite/form/model/dirty.rb'
   DisplayCopNames: true
-  TargetRubyVersion: 2.4.0
+  TargetRubyVersion: 2.6
+  NewCops: enable
 
-Lint/AmbiguousBlockAssociation:
+RSpec/MultipleExpectations:
   Enabled: false
 
-Lint/EndAlignment:
-  EnforcedStyleAlignWith: variable
-
-Layout/AccessModifierIndentation:
-  EnforcedStyle: outdent
-
-Layout/AlignHash:
-  EnforcedLastArgumentHashStyle: always_ignore
-
-Layout/AlignParameters:
-  EnforcedStyle: with_fixed_indentation
-
-Layout/CaseIndentation:
-  EnforcedStyle: end
-
-Layout/IndentArray:
-  EnforcedStyle: consistent
-
-Layout/IndentHash:
-  EnforcedStyle: consistent
-
-Layout/IndentHeredoc:
+RSpec/NestedGroups:
   Enabled: false
 
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
+RSpec/MessageSpies:
+  Enabled: false
 
-Layout/MultilineOperationIndentation:
-  EnforcedStyle: indented
-
-Layout/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
-
-Metrics/BlockLength:
-  Exclude:
-    - '**/*_spec.rb'
-    - '**/*_examples.rb'
-    - '**/*.rake'
-
-Metrics/ModuleLength:
-  Exclude:
-    - '**/*_spec.rb'
-    - 'lib/granite/form.rb'
-
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/AndOr:
-  EnforcedStyle: conditionals
-
-Style/DoubleNegation:
+Gemspec/DevelopmentDependencies:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Style/MissingRespondToMissing:
   Enabled: false

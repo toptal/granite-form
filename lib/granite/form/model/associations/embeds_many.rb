@@ -23,14 +23,14 @@ module Granite
               default = Array.wrap(reflection.default(owner))
               if default.present?
                 collection = if default.all? { |object| object.is_a?(reflection.klass) }
-                  default
-                else
-                  default.map do |attributes|
-                    reflection.klass.with_sanitize(false) do
-                      build_object(attributes)
-                    end
-                  end
-                end
+                               default
+                             else
+                               default.map do |attributes|
+                                 reflection.klass.with_sanitize(false) do
+                                   build_object(attributes)
+                                 end
+                               end
+                             end
                 collection.map { |object| object.send(:clear_changes_information) } if reflection.klass.dirty?
                 collection
               end
@@ -64,13 +64,13 @@ module Granite
             end
           end
 
-          alias_method :writer, :replace
+          alias writer replace
 
           def concat(*objects)
             append objects.flatten
           end
 
-        private
+          private
 
           def read_source
             super || []
@@ -78,7 +78,11 @@ module Granite
 
           def append(objects)
             objects.each do |object|
-              raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object && object.is_a?(reflection.klass)
+              unless object.is_a?(reflection.klass)
+                raise AssociationTypeMismatch.new(reflection.klass,
+                                                  object.class)
+              end
+
               push_object object
             end
             target

@@ -24,7 +24,7 @@ module Granite
 
             def reference_key
               @reference_key ||= options[:reference_key].presence.try(:to_sym) ||
-                :"#{name}_#{primary_key}"
+                                 :"#{name}_#{primary_key}"
             end
           end
         end

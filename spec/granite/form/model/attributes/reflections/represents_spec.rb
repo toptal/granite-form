@@ -23,7 +23,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents do
     end
 
     let(:instance) { Target.new attributes }
-    let(:attributes) { {subject: Author.new} }
+    let(:attributes) { { subject: Author.new } }
     let!(:reflection) { build_reflection }
 
     it { expect(reflection.reference).to eq('author') }
@@ -53,7 +53,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents do
       context 'when validate_reference is false' do
         let(:reflection) { build_reflection(validate_reference: false) }
 
-        it { expect { instance.validate }.not_to change { instance.errors.messages } }
+        it { expect { instance.validate }.not_to(change { instance.errors.messages }) }
       end
     end
   end

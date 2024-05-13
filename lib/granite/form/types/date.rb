@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class Date < Object
-      private
+        private
 
         def typecast(value)
           value.try(:to_date)

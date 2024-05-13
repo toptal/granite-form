@@ -7,6 +7,7 @@ module Granite
 
           def write(value)
             return if readonly?
+
             pollute do
               write_value value
             end

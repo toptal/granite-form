@@ -19,7 +19,7 @@ describe Granite::Form::Model::Persistence do
     context do
       subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
 
-      specify { expect(subject.instance_variable_get(:@initial_attributes)).to eq({name: 'Hello'}.stringify_keys) }
+      specify { expect(subject.instance_variable_get(:@initial_attributes)).to eq({ name: 'Hello' }.stringify_keys) }
     end
   end
 
@@ -28,17 +28,27 @@ describe Granite::Form::Model::Persistence do
       subject(:instances) { model.instantiate_collection(name: 'Hello', foo: 'Bar') }
 
       specify { expect(subject).to be_a Array }
-      specify { expect(subject.first.instance_variable_get(:@initial_attributes)).to eq({name: 'Hello'}.stringify_keys) }
+
+      specify do
+        expect(subject.first.instance_variable_get(:@initial_attributes)).to eq({ name: 'Hello' }.stringify_keys)
+      end
     end
 
     context do
+      subject(:instances) { model.instantiate_collection([{ name: 'Hello', foo: 'Bar' }, { name: 'World' }]) }
+
       before { model.send(:include, Granite::Form::Model::Scopes) }
-      subject(:instances) { model.instantiate_collection([{name: 'Hello', foo: 'Bar'}, {name: 'World'}]) }
 
       specify { expect(subject).to be_a Granite::Form::Model::Scopes::ScopeProxy }
       specify { expect(subject.count).to eq(2) }
-      specify { expect(subject.first.instance_variable_get(:@initial_attributes)).to eq({name: 'Hello'}.stringify_keys) }
-      specify { expect(subject.second.instance_variable_get(:@initial_attributes)).to eq({name: 'World'}.stringify_keys) }
+
+      specify do
+        expect(subject.first.instance_variable_get(:@initial_attributes)).to eq({ name: 'Hello' }.stringify_keys)
+      end
+
+      specify do
+        expect(subject.second.instance_variable_get(:@initial_attributes)).to eq({ name: 'World' }.stringify_keys)
+      end
     end
   end
 end

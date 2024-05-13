@@ -48,7 +48,7 @@ module Granite
             target
           end
 
-          alias_method :writer, :replace
+          alias writer replace
 
           def identify
             reflection.persistence_adapter.identify(target)

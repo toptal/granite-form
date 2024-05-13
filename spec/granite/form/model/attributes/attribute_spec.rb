@@ -5,12 +5,17 @@ describe Granite::Form::Model::Attributes::Attribute do
 
   def attribute(*args)
     options = args.extract_options!
-    Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
+    Dummy.add_attribute(Granite::Form::Model::Attributes::Reflections::Attribute, :field,
+                        { type: Object }.merge(options))
     Dummy.new.attribute(:field)
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(v) { v ? v.strip : v }, default: :world, enum: %w[hello 42 world]) }
+    let(:field) do
+      attribute(type: String, normalizer: lambda { |v|
+                                            v ? v.strip : v
+                                          }, default: :world, enum: %w[hello 42 world])
+    end
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq('world') }
     specify { expect(field.tap { |r| r.write(:world) }.read).to eq('world') }
@@ -36,7 +41,11 @@ describe Granite::Form::Model::Attributes::Attribute do
     specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
 
     context ':readonly' do
-      specify { expect(attribute(readonly: true, default: :world).tap { |r| r.write('string') }.read_before_type_cast).to eq(:world) }
+      specify do
+        expect(attribute(readonly: true, default: :world).tap do |r|
+                 r.write('string')
+               end.read_before_type_cast).to eq(:world)
+      end
     end
   end
 
@@ -58,11 +67,22 @@ describe Granite::Form::Model::Attributes::Attribute do
   describe '#normalize' do
     specify { expect(attribute.normalize(' hello ')).to eq(' hello ') }
     specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }
-    specify { expect(attribute(normalizer: [->(v) { v.strip }, ->(v) { v.first(4) }]).normalize(' hello ')).to eq('hell') }
-    specify { expect(attribute(normalizer: [->(v) { v.first(4) }, ->(v) { v.strip }]).normalize(' hello ')).to eq('hel') }
+
+    specify do
+      expect(attribute(normalizer: [->(v) { v.strip }, lambda { |v|
+                                                         v.first(4)
+                                                       }]).normalize(' hello ')).to eq('hell')
+    end
+
+    specify do
+      expect(attribute(normalizer: [->(v) { v.first(4) }, lambda { |v|
+                                                            v.strip
+                                                          }]).normalize(' hello ')).to eq('hel')
+    end
 
     context do
       before { allow_any_instance_of(Dummy).to receive_messages(value: 'value') }
+
       let(:other) { 'other' }
 
       specify { expect(attribute(normalizer: ->(_v) { value }).normalize(' hello ')).to eq('value') }
@@ -89,12 +109,14 @@ describe Granite::Form::Model::Attributes::Attribute do
       specify { expect(attribute(normalizer: :strip).normalize(' hello ')).to eq('hello') }
       specify { expect(attribute(normalizer: %i[strip trim]).normalize(' hello ')).to eq('he') }
       specify { expect(attribute(normalizer: %i[trim strip]).normalize(' hello ')).to eq('h') }
-      specify { expect(attribute(normalizer: [:strip, {trim: {length: 4}}]).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: {strip: {}, trim: {length: 4}}).normalize(' hello ')).to eq('hell') }
+      specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hell') }
+      specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
+
       specify do
-        expect(attribute(normalizer: [:strip, {trim: {length: 4}}, ->(v) { v.last(2) }])
+        expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
         .normalize(' hello ')).to eq('ll')
       end
+
       specify { expect(attribute(normalizer: :reset).normalize('')).to eq(nil) }
       specify { expect(attribute(normalizer: %i[strip reset]).normalize('   ')).to eq(nil) }
       specify { expect(attribute(normalizer: :reset, default: '!!!').normalize(nil)).to eq('!!!') }
@@ -103,10 +125,11 @@ describe Granite::Form::Model::Attributes::Attribute do
       context do
         let(:length) { 3 }
 
-        specify { expect(attribute(normalizer: [:strip, {trim: {length: 4}}]).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: {strip: {}, trim: {length: 4}}).normalize(' hello ')).to eq('hel') }
+        specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hel') }
+        specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
+
         specify do
-          expect(attribute(normalizer: [:strip, {trim: {length: 4}}, ->(v) { v.last(2) }])
+          expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
           .normalize(' hello ')).to eq('el')
         end
       end

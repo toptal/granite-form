@@ -5,6 +5,7 @@ module Granite
     module Types
       class Object
         attr_reader :reflection, :owner, :type
+
         delegate :name, to: :reflection
 
         def initialize(type, reflection, owner)
@@ -34,7 +35,7 @@ module Granite
           end.to_set
         end
 
-      private
+        private
 
         def ensure_type(value)
           if value.instance_of?(type)

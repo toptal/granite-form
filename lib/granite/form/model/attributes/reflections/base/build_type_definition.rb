@@ -6,6 +6,7 @@ module Granite
           class Base
             class BuildTypeDefinition
               attr_reader :owner, :reflection
+
               delegate :name, to: :reflection
 
               def initialize(owner, reflection)
@@ -19,7 +20,7 @@ module Granite
                 type_definition_for(type)
               end
 
-            private
+              private
 
               def type
                 reflection.options[:type]

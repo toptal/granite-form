@@ -34,13 +34,16 @@ describe Granite::Form::Model::Validations::NestedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_one: { name: 'name' } }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_one: {} }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_one.name': ["can't be blank"])
@@ -48,23 +51,28 @@ describe Granite::Form::Model::Validations::NestedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: { name: 'name' } }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: {} }
+
     it { is_expected.to be_valid }
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{name: 'name'}] }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ name: 'name' }] }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}] }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_many.0.name': ["can't be blank"])
@@ -72,18 +80,22 @@ describe Granite::Form::Model::Validations::NestedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{name: 'name'}] }
+    subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{ name: 'name' }] }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{}] }
+
     it { is_expected.to be_valid }
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{name: 'name'}], validated_one: {} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ name: 'name' }], validated_one: {} }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_one.name': ["can't be blank"])
@@ -91,26 +103,30 @@ describe Granite::Form::Model::Validations::NestedValidator do
   end
 
   context 'accepts nested attributes for one' do
+    subject(:instance) { Main.instantiate name: 'hello', validated_one: { id: 1, name: 'name' } }
+
     before { Main.accepts_nested_attributes_for :validated_one, allow_destroy: true }
-    subject(:instance) { Main.instantiate name: 'hello', validated_one: {id: 1, name: 'name'} }
 
     specify do
-      instance.validated_one_attributes = {id: 1, name: '', _destroy: true}
-      is_expected.to be_valid
+      instance.validated_one_attributes = { id: 1, name: '', _destroy: true }
+      expect(subject).to be_valid
     end
   end
 
   context 'accepts nested attributes for many' do
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ id: 1, name: 'name' }] }
+
     before { Main.accepts_nested_attributes_for :validated_many, allow_destroy: true }
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{id: 1, name: 'name'}] }
 
     specify do
-      instance.validated_many_attributes = [{id: 1, name: '', _destroy: true}]
-      is_expected.to be_valid
+      instance.validated_many_attributes = [{ id: 1, name: '', _destroy: true }]
+      expect(subject).to be_valid
     end
   end
 
   context 'object field is invalid and referenced object does not include AutosaveAssociation' do
+    subject(:instance) { Main.instantiate name: 'hello', object: object }
+
     before do
       stub_model(:validated_object) do
         attribute :title, String
@@ -124,8 +140,6 @@ describe Granite::Form::Model::Validations::NestedValidator do
         validates :object, nested: true
       end
     end
-
-    subject(:instance) { Main.instantiate name: 'hello', object: object }
 
     context 'nested object is valid' do
       let(:object) { ValidatedObject.new(title: 'Mr.') }
@@ -190,8 +204,10 @@ describe Granite::Form::Model::Validations::NestedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}], validated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}], validated_one: { name: 'name' } }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_many.0.name': ["can't be blank"])

@@ -21,6 +21,7 @@ RSpec.describe Granite::Form::Util do
 
   describe '#evaluate' do
     subject { dummy.evaluate(target) }
+
     let(:target) { 'Peter' }
 
     it { is_expected.to eq('Peter') }
@@ -56,6 +57,7 @@ RSpec.describe Granite::Form::Util do
 
   describe '#evaluate_if_proc' do
     subject { dummy.evaluate(target) }
+
     let(:target) { 'Peter' }
 
     it { is_expected.to eq('Peter') }
@@ -77,7 +79,8 @@ RSpec.describe Granite::Form::Util do
 
   describe '#conditions_satisfied?' do
     subject { dummy.conditions_satisfied?(**conditions) }
-    let(:conditions) { {if: -> { name == 'John' }} }
+
+    let(:conditions) { { if: -> { name == 'John' } } }
 
     it { is_expected.to be_truthy }
 
@@ -88,7 +91,7 @@ RSpec.describe Granite::Form::Util do
     end
 
     context 'when unless condition is passed' do
-      let(:conditions) { {unless: :name} }
+      let(:conditions) { { unless: :name } }
 
       it { is_expected.to be_falsey }
     end
@@ -100,7 +103,7 @@ RSpec.describe Granite::Form::Util do
     end
 
     context 'when both if & unless are passed' do
-      let(:conditions) { {if: :name, unless: :name} }
+      let(:conditions) { { if: :name, unless: :name } }
 
       it { expect { subject }.to raise_error(ArgumentError) }
     end

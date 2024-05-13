@@ -8,8 +8,8 @@ module Granite
 
             delegate :target, :loaded?, :reload, :clear, :concat, to: :@association
             delegate :each, :size, :length, :first, :last, :empty?, :many?, :==, :dup, to: :target
-            alias_method :<<, :concat
-            alias_method :push, :concat
+            alias << concat
+            alias push concat
 
             def initialize(association)
               @association = association
@@ -19,7 +19,7 @@ module Granite
               dup
             end
 
-            alias_method :to_a, :to_ary
+            alias to_a to_ary
 
             def inspect
               entries = target.take(10).map!(&:inspect)

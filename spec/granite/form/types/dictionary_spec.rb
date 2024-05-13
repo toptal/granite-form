@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Granite::Form::Types::Dictionary do
   subject(:type) { described_class.new(subtype_definition) }
+
   let(:element_type) { Dummy }
   let(:subtype_definition) { Granite::Form::Types::Object.new(element_type, reflection, nil) }
   let(:reflection) { build_reflection }

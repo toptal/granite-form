@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class UUID < Object
-      private
+        private
 
         def typecast(value)
           case value

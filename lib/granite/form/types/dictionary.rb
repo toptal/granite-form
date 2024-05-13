@@ -10,7 +10,7 @@ module Granite
           value.transform_values { |v| subtype_definition.prepare(v) }.with_indifferent_access
         end
 
-      private
+        private
 
         def to_hash(value)
           Hash[value]

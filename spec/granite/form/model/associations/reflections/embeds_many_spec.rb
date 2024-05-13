@@ -14,6 +14,7 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
       embeds_many :projects
     end
   end
+
   let(:user) { User.new }
 
   context ':read, :write' do
@@ -24,14 +25,14 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
         attribute :name
         embeds_many :projects,
-          read: lambda { |reflection, object|
-            value = object.instance_variable_get("@_value_#{reflection.name}")
-            JSON.parse(value) if value.present?
-          },
-          write: lambda { |reflection, object, value|
-            value = value.to_json if value
-            object.instance_variable_set("@_value_#{reflection.name}", value)
-          }
+                    read: lambda { |reflection, object|
+                      value = object.instance_variable_get("@_value_#{reflection.name}")
+                      JSON.parse(value) if value.present?
+                    },
+                    write: lambda { |reflection, object, value|
+                      value = value.to_json if value
+                      object.instance_variable_set("@_value_#{reflection.name}", value)
+                    }
       end
     end
 
@@ -55,16 +56,18 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
     describe '#build' do
       let(:project) { Project.new title: 'Project' }
+
       specify { expect(user.projects.build(title: 'Project')).to eq(project) }
       specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
     end
 
     describe '#reload' do
       let(:project) { Project.new title: 'Project' }
+
       before do
-        user.write_attribute(:projects, [{title: 'Project'}])
+        user.write_attribute(:projects, [{ title: 'Project' }])
+        user.projects.build
       end
-      before { user.projects.build }
 
       specify { expect(user.projects.count).to eq(2) }
       specify { expect(user.projects.reload).to eq([project]) }
@@ -72,26 +75,41 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
     describe '#concat' do
       let(:project) { Project.new title: 'Project' }
+
       specify { expect { user.projects.concat project }.to change { user.projects }.from([]).to([project]) }
-      specify { expect { user.projects.concat project, 'string' }.to raise_error Granite::Form::AssociationTypeMismatch }
+
+      specify do
+        expect do
+          user.projects.concat project, 'string'
+        end.to raise_error Granite::Form::AssociationTypeMismatch
+      end
 
       context do
         let(:other) { Project.new title: 'Other' }
+
         before { user.projects = [other] }
-        specify { expect { user.projects.concat project }.to change { user.projects }.from([other]).to([other, project]) }
+
+        specify do
+          expect { user.projects.concat project }.to change {
+                                                       user.projects
+                                                     }.from([other]).to([other, project])
+        end
       end
     end
   end
 
   describe '#projects=' do
     let(:project) { Project.new title: 'Project' }
+
     specify { expect { user.projects = [] }.not_to change { user.projects }.from([]) }
     specify { expect { user.projects = [project] }.to change { user.projects }.from([]).to([project]) }
     specify { expect { user.projects = [project, 'string'] }.to raise_error Granite::Form::AssociationTypeMismatch }
 
     context do
       let(:other) { Project.new title: 'Other' }
+
       before { user.projects = [other] }
+
       specify { expect { user.projects = [project] }.to change { user.projects }.from([other]).to([project]) }
       specify { expect { user.projects = [] }.to change { user.projects }.from([other]).to([]) }
     end
@@ -112,8 +130,18 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project')]) }
+
+      specify do
+        expect(User.new.tap do |u|
+                 u.projects.build(title: 'Project')
+               end.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded)
+      end
+
+      specify do
+        expect(User.new.tap do |u|
+                 u.projects.build(title: 'Project')
+               end.projects).to match([have_attributes(title: 'Project')])
+      end
     end
 
     context do
@@ -130,8 +158,18 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project', value: nil)]) }
+
+      specify do
+        expect(User.new.tap do |u|
+                 u.projects.build(title: 'Project')
+               end.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded)
+      end
+
+      specify do
+        expect(User.new.tap do |u|
+                 u.projects.build(title: 'Project')
+               end.projects).to match([have_attributes(title: 'Project', value: nil)])
+      end
     end
   end
 end

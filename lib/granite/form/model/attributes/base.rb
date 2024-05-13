@@ -4,6 +4,7 @@ module Granite
       module Attributes
         class Base
           attr_reader :type_definition
+
           delegate :type, :reflection, :owner, :enum, to: :type_definition
           delegate :name, :readonly, to: :reflection
 
@@ -20,6 +21,7 @@ module Granite
 
           def write(value)
             return if readonly?
+
             write_value value
           end
 
@@ -57,12 +59,12 @@ module Granite
 
           def inspect_attribute
             value = case read
-            when Date, Time, DateTime
-              %("#{read.to_formatted_s(:db)}")
-            else
-              inspection = read.inspect
-              inspection.size > 100 ? inspection.truncate(50) : inspection
-            end
+                    when Date, Time, DateTime
+                      %("#{read.to_formatted_s(:db)}")
+                    else
+                      inspection = read.inspect
+                      inspection.size > 100 ? inspection.truncate(50) : inspection
+                    end
             "#{name}: #{value}"
           end
 
@@ -89,7 +91,7 @@ module Granite
             end
           end
 
-        private
+          private
 
           def remove_variable(*names)
             names.flatten.each do |name|

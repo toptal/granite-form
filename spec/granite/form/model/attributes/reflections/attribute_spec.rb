@@ -10,6 +10,7 @@ describe Granite::Form::Model::Attributes::Reflections::Attribute do
 
     specify { expect(described_class.build(Class.new, Target, :field, String).type).to eq(String) }
     specify { expect(described_class.build(Class.new, Target, :field) {}.defaultizer).to be_a(Proc) }
+
     specify do
       described_class.build(Class.new, Target, :field)
 

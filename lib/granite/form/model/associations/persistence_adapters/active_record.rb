@@ -21,7 +21,7 @@ module Granite
               enum: String
             }.freeze
 
-            alias_method :data_type, :data_source
+            alias data_type data_source
 
             def build(attributes)
               data_source.new(attributes)
@@ -32,10 +32,10 @@ module Granite
 
               if scope_proc
                 scope = if scope_proc.arity.zero?
-                  scope.instance_exec(&scope_proc)
-                else
-                  scope.instance_exec(owner, &scope_proc)
-                end
+                          scope.instance_exec(&scope_proc)
+                        else
+                          scope.instance_exec(owner, &scope_proc)
+                        end
               end
 
               scope.where(primary_key => source)
