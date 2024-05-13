@@ -41,9 +41,9 @@ describe Granite::Form::Model::Attributes::Attribute do
 
     context ':readonly' do
       specify do
-        expect(attribute(readonly: true, default: :world).tap do |r|
-                 r.write('string')
-               end.read_before_type_cast).to eq(:world)
+        attr = attribute(readonly: true, default: :world)
+        attr.write('string')
+        expect(attr.read_before_type_cast).to eq(:world)
       end
     end
   end
