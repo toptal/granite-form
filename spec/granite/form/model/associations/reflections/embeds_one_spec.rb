@@ -111,9 +111,9 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
       specify { expect(Book.new.tap { |b| b.build_author(name: 'Author') }.author).to be_a(Book::Author) }
 
       specify do
-        expect(Book.new.tap do |b|
-                 b.build_author(name: 'Author')
-               end.author).to have_attributes(name: 'Author', age: nil)
+        book = Book.new
+        book.build_author(name: 'Author')
+        expect(book.author).to have_attributes(name: 'Author', age: nil)
       end
     end
   end

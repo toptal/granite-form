@@ -269,15 +269,17 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     it { expect(book_with_author.author_ids).to eq([author.id]) }
 
     xit do
-      expect { book_with_author.author_ids << other.id }.to change {
-                                                              book_with_author.authors
-                                                            }.from([author]).to([author, other])
+      expect { book_with_author.author_ids << other.id }
+        .to change { book_with_author.authors }
+        .from([author])
+        .to([author, other])
     end
 
     it {
-      expect { book_with_author.author_ids = [other.id] }.to change {
-                                                               book_with_author.authors
-                                                             }.from([author]).to([other])
+      expect { book_with_author.author_ids = [other.id] }
+        .to change { book_with_author.authors }
+        .from([author])
+        .to([other])
     }
   end
 
@@ -322,24 +324,27 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.authors }.from([]) }
 
     specify do
-      expect { book.author_ids = [author.id.next.to_s, author.id] }.to change {
-                                                                         book.author_ids
-                                                                       }.from([]).to([author.id])
+      expect { book.author_ids = [author.id.next.to_s, author.id] }
+        .to change { book.author_ids }
+        .from([])
+        .to([author.id])
     end
 
     specify do
-      expect { book.author_ids = [author.id.next.to_s, author.id] }.to change {
-                                                                         book.authors
-                                                                       }.from([]).to([author])
+      expect { book.author_ids = [author.id.next.to_s, author.id] }
+        .to change { book.authors }
+        .from([])
+        .to([author])
     end
 
     context do
       before { book.authors = [other] }
 
       specify do
-        expect { book.author_ids = [author.id] }.to change {
-                                                      book.author_ids
-                                                    }.from([other.id]).to([author.id])
+        expect { book.author_ids = [author.id] }
+          .to change { book.author_ids }
+          .from([other.id])
+          .to([author.id])
       end
 
       specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([other]).to([author]) }

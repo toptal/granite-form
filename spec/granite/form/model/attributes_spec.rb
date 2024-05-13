@@ -386,35 +386,23 @@ describe Granite::Form::Model::Attributes do
       specify { with_assigned_value(1).to have_attributes(dict: {}, dict_before_type_cast: 1) }
 
       specify do
-        with_assigned_value(from: 1,
-                            to: 2).to have_attributes(dict: { 'from' => 1, 'to' => 2 },
-                                                      dict_before_type_cast: {
-                                                        from: 1, to: 2
-                                                      })
+        with_assigned_value(from: 1, to: 2)
+          .to have_attributes(dict: { 'from' => 1, 'to' => 2 }, dict_before_type_cast: { from: 1, to: 2 })
       end
 
       specify do
-        with_assigned_value(from: 2,
-                            to: 4).to have_attributes(dict: { 'from' => 2, 'to' => nil },
-                                                      dict_before_type_cast: {
-                                                        from: 2, to: 4
-                                                      })
+        with_assigned_value(from: 2, to: 4)
+          .to have_attributes(dict: { 'from' => 2, 'to' => nil }, dict_before_type_cast: { from: 2, to: 4 })
       end
 
       specify do
-        with_assigned_value(from: '1',
-                            to: '2').to have_attributes(dict: { 'from' => 1, 'to' => 2 },
-                                                        dict_before_type_cast: {
-                                                          from: '1', to: '2'
-                                                        })
+        with_assigned_value(from: '1', to: '2')
+          .to have_attributes(dict: { 'from' => 1, 'to' => 2 }, dict_before_type_cast: { from: '1', to: '2' })
       end
 
       specify do
-        with_assigned_value(from: 3,
-                            to: 1).to have_attributes(dict: { 'from' => 1, 'to' => 3 },
-                                                      dict_before_type_cast: {
-                                                        from: 3, to: 1
-                                                      })
+        with_assigned_value(from: 3, to: 1)
+          .to have_attributes(dict: { 'from' => 1, 'to' => 3 }, dict_before_type_cast: { from: 3, to: 1 })
       end
     end
 

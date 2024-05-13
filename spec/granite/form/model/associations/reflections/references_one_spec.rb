@@ -267,9 +267,10 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
     specify { expect { book.author_id = author }.to change { book.author }.from(nil).to(author) }
 
     specify do
-      expect { book.author_id = author.id.next.to_s }.to change {
-                                                           book.author_id
-                                                         }.from(nil).to(author.id.next)
+      expect { book.author_id = author.id.next.to_s }
+        .to change { book.author_id }
+        .from(nil)
+        .to(author.id.next)
     end
 
     specify { expect { book.author_id = author.id.next.to_s }.not_to change { book.author }.from(nil) }
