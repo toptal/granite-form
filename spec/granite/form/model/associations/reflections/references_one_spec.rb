@@ -14,6 +14,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       references_one :author
     end
   end
+
   let(:book) { Book.new }
 
   specify { expect(book.author).to be_nil }
@@ -27,12 +28,14 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
         references_one :creator, class_name: 'Author'
       end
     end
+
     let(:author) { Author.create!(name: 'Rick') }
 
     specify do
       expect { book.creator = author }
         .to change { book.creator }.from(nil).to(author)
     end
+
     specify do
       expect { book.creator = author }
         .to change { book.creator_id }.from(nil).to(author.id)
@@ -54,6 +57,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       expect { book.author_name = author.name }
         .to change { book.author }.from(nil).to(author)
     end
+
     specify do
       expect { book.author = author }
         .to change { book.author_name }.from(nil).to(author.name)
@@ -74,6 +78,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       expect { book.identify = author.id }
         .to change { book.author }.from(nil).to(author)
     end
+
     specify do
       expect { book.author = author }
         .to change { book.identify }.from(nil).to(author.id)
@@ -81,7 +86,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
   end
 
   describe ':default' do
-    shared_examples_for :persisted_default do |default|
+    shared_examples_for 'persisted default' do |default|
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
@@ -108,10 +113,10 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       specify { expect { book.owner_id = '' }.to change { book.owner }.from(author).to(nil) }
     end
 
-    it_behaves_like :persisted_default, -> { author.id }
-    it_behaves_like :persisted_default, -> { author }
+    it_behaves_like 'persisted default', -> { author.id }
+    it_behaves_like 'persisted default', -> { author }
 
-    shared_examples_for :new_record_default do |default|
+    shared_examples_for 'new record default' do |default|
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
@@ -137,8 +142,8 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       specify { expect { book.owner_id = '' }.to change { book.owner }.from(instance_of(Author)).to(nil) }
     end
 
-    it_behaves_like :new_record_default, name: 'Author'
-    it_behaves_like :new_record_default, -> { Author.new(name: 'Author') }
+    it_behaves_like 'new record default', name: 'Author'
+    it_behaves_like 'new record default', -> { Author.new(name: 'Author') }
   end
 
   describe 'Book.inspect' do
@@ -160,8 +165,9 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
 
     specify do
       expect { book.author_id = author1.id }
-        .not_to change { book.author }
+        .not_to(change { book.author })
     end
+
     specify do
       expect { book.author_id = author2.id }
         .to change { book.author }.from(nil).to(author2)
@@ -171,6 +177,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       expect { book.author = author1 }
         .to change { book.author_id }.from(nil).to(author1.id)
     end
+
     specify do
       expect { book.author = author2 }
         .to change { book.author_id }.from(nil).to(author2.id)
@@ -183,6 +190,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
           book.author_id
         }.from(nil).to(author1.id)
     end
+
     specify do
       expect { book.author = author2 }
         .to change {
@@ -193,11 +201,12 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
 
     specify do
       expect { book.author = author1 }
-        .not_to change {
+        .not_to(change do
           book.association(:author).reload
           book.author
-        }
+        end)
     end
+
     specify do
       expect { book.author = author2 }
         .to change {
@@ -220,12 +229,15 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
 
   describe '#author=' do
     let(:author) { Author.create! name: 'Author' }
+
     specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }
     specify { expect { book.author = 'string' }.to raise_error Granite::Form::AssociationTypeMismatch }
 
     context do
       let(:other) { Author.create! name: 'Other' }
+
       before { book.author = other }
+
       specify { expect { book.author = author }.to change { book.author }.from(other).to(author) }
       specify { expect { book.author = author }.to change { book.author_id }.from(other.id).to(author.id) }
       specify { expect { book.author = nil }.to change { book.author }.from(other).to(nil) }
@@ -234,29 +246,40 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
 
     context 'model not persisted' do
       let(:author) { Author.new }
+
       specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }
       specify { expect { book.author = author }.not_to change { book.author_id }.from(nil) }
 
       context do
         before { book.author = author }
+
         specify { expect { author.save! }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
-        specify { expect { author.save! }.not_to change { book.author } }
+        specify { expect { author.save! }.not_to(change { book.author }) }
       end
     end
   end
 
   describe '#author_id=' do
     let(:author) { Author.create!(name: 'Author') }
+
     specify { expect { book.author_id = author.id }.to change { book.author_id }.from(nil).to(author.id) }
     specify { expect { book.author_id = author.id }.to change { book.author }.from(nil).to(author) }
     specify { expect { book.author_id = author }.to change { book.author }.from(nil).to(author) }
 
-    specify { expect { book.author_id = author.id.next.to_s }.to change { book.author_id }.from(nil).to(author.id.next) }
+    specify do
+      expect { book.author_id = author.id.next.to_s }
+        .to change { book.author_id }
+        .from(nil)
+        .to(author.id.next)
+    end
+
     specify { expect { book.author_id = author.id.next.to_s }.not_to change { book.author }.from(nil) }
 
     context do
       let(:other) { Author.create!(name: 'Other') }
+
       before { book.author = other }
+
       specify { expect { book.author_id = author.id }.to change { book.author_id }.from(other.id).to(author.id) }
       specify { expect { book.author_id = author.id }.to change { book.author }.from(other).to(author) }
       specify { expect { book.author_id = nil }.to change { book.author_id }.from(other.id).to(nil) }

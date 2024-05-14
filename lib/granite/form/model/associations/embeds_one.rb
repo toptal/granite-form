@@ -30,12 +30,12 @@ module Granite
             return unless default
 
             object = if default.is_a?(reflection.klass)
-              default
-            else
-              reflection.klass.with_sanitize(false) do
-                build_object(default)
-              end
-            end
+                       default
+                     else
+                       reflection.klass.with_sanitize(false) do
+                         build_object(default)
+                       end
+                     end
             object.send(:clear_changes_information) if reflection.klass.dirty?
             object
           end
@@ -58,6 +58,7 @@ module Granite
           def replace(object)
             if object
               raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
+
               transaction do
                 clear
                 self.target = object
@@ -69,9 +70,9 @@ module Granite
             target
           end
 
-          alias_method :writer, :replace
+          alias writer replace
 
-        private
+          private
 
           def setup_performers!(object)
             embed_object(object)

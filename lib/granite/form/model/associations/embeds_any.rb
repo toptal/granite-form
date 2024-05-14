@@ -3,7 +3,7 @@ module Granite
     module Model
       module Associations
         class EmbedsAny < Base
-        private
+          private
 
           def build_object(attributes)
             reflection.klass.new(attributes)

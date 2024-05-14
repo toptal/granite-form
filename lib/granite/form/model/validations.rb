@@ -1,3 +1,6 @@
+require_relative 'validations/nested'
+require_relative 'validations/associated'
+
 module Granite
   module Form
     module Model
@@ -22,7 +25,7 @@ module Granite
           valid?(context) || raise_validation_error
         end
 
-      protected
+        protected
 
         def raise_validation_error
           raise Granite::Form::ValidationError, self
@@ -31,5 +34,3 @@ module Granite
     end
   end
 end
-
-Dir[File.dirname(__FILE__) + '/validations/*.rb'].each { |file| require file }

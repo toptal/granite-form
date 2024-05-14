@@ -29,7 +29,7 @@ describe Granite::Form::Model::Validations do
     end
 
     context 'when attribute has different validations' do
-      let(:add_validations) { model.validates :name, length: {maximum: 100} }
+      let(:add_validations) { model.validates :name, length: { maximum: 100 } }
 
       it { is_expected.to be_falsey }
     end

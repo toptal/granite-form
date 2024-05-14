@@ -25,17 +25,17 @@ module Granite
 
             def klass
               @klass ||= if options[:data_source].present?
-                options[:data_source].to_s.constantize
-              else
-                super
-              end
+                           options[:data_source].to_s.constantize
+                         else
+                           super
+                         end
             end
 
-            alias_method :data_source, :klass
+            alias data_source klass
 
             def persistence_adapter
               @persistence_adapter ||= self.class.persistence_adapter(klass)
-                .new(data_source, options[:primary_key], @scope_proc)
+                                           .new(data_source, options[:primary_key], @scope_proc)
             end
 
             def read_source(object)

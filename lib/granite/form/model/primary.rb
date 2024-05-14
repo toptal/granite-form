@@ -29,7 +29,7 @@ module Granite
             alias_attribute :primary_attribute, _primary_name
           end
 
-          alias_method :primary_attribute, :primary
+          alias primary_attribute primary
 
           def has_primary_attribute? # rubocop:disable Naming/PredicateName
             has_attribute? _primary_name

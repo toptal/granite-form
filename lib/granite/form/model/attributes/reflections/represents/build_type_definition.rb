@@ -19,7 +19,7 @@ module Granite
                 end
               end
 
-            private
+              private
 
               def reference
                 owner.__send__(reflection.reference)
@@ -61,7 +61,7 @@ module Granite
 
               def convert_active_model_type_to_definition(attribute_type)
                 type = attribute_type.try(:value_class) ||
-                  Associations::PersistenceAdapters::ActiveRecord::TYPES[attribute_type.type&.to_sym]
+                       Associations::PersistenceAdapters::ActiveRecord::TYPES[attribute_type.type&.to_sym]
                 type_definition_for(type) if type
               end
             end

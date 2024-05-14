@@ -9,7 +9,7 @@ module Granite
             run_validations!
           end
 
-          alias_method :validate_ancestry, :valid_ancestry?
+          alias validate_ancestry valid_ancestry?
 
           def invalid_ancestry?
             !valid_ancestry?
@@ -19,16 +19,16 @@ module Granite
             valid_ancestry? || raise_validation_error
           end
 
-        private
+          private
 
           def validate_nested!
             association_names.each do |name|
               association = association(name)
               invalid_block = if association.reflection.klass.method_defined?(:invalid_ansestry?)
-                ->(object) { object.invalid_ansestry? }
-              else
-                ->(object) { object.invalid? }
-              end
+                                ->(object) { object.invalid_ansestry? }
+                              else
+                                ->(object) { object.invalid? }
+                              end
 
               Granite::Form::Model::Validations::NestedValidator
                 .validate_nested(self, name, association.target, &invalid_block)

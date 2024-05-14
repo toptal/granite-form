@@ -19,7 +19,7 @@ module Granite
           !persisted?
         end
 
-        alias_method :new_object?, :new_record?
+        alias new_object? new_record?
 
         module ClassMethods
           def i18n_scope

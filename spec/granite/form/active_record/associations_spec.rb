@@ -57,16 +57,19 @@ describe Granite::Form::ActiveRecord::Associations do
     describe '#projects' do
       specify do
         expect { user.projects << Project.new }
-          .not_to change { user.read_attribute(:projects) }
+          .not_to(change { user.read_attribute(:projects) })
       end
+
       specify do
         expect { user.projects << Project.new(title: 'First') }
-          .not_to change { user.read_attribute(:projects) }
+          .not_to(change { user.read_attribute(:projects) })
       end
+
       specify do
         expect { user.projects << Project.new(title: 'First') }
-          .not_to change { user.projects.reload.count }
+          .not_to(change { user.projects.reload.count })
       end
+
       specify do
         user.projects << Project.new(title: 'First')
         user.save
@@ -77,12 +80,14 @@ describe Granite::Form::ActiveRecord::Associations do
     describe '#profile' do
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
-          .not_to change { user.read_attribute(:profile) }
+          .not_to(change { user.read_attribute(:profile) })
       end
+
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
           .to change { user.profile }.from(nil).to(an_instance_of(Profile))
       end
+
       specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
@@ -110,8 +115,9 @@ describe Granite::Form::ActiveRecord::Associations do
     describe '#projects' do
       specify do
         expect { user.projects << Project.new(title: 'First') }
-          .not_to change { user.read_attribute(:projects) }
+          .not_to(change { user.read_attribute(:projects) })
       end
+
       specify do
         user.projects << Project.new(title: 'First')
         user.save
@@ -120,19 +126,21 @@ describe Granite::Form::ActiveRecord::Associations do
 
       context do
         let(:project) { Project.new(title: 'First') }
+
         before { project.build_author(name: 'Author') }
 
         specify do
           expect { user.projects << project }
-            .not_to change { user.read_attribute(:projects) }
+            .not_to(change { user.read_attribute(:projects) })
         end
+
         specify do
           expect do
             user.projects << project
             user.save
           end
             .to change { user.reload.read_attribute(:projects) }.from([])
-            .to([{'title' => 'First', 'author' => {'name' => 'Author'}}])
+            .to([{ 'title' => 'First', 'author' => { 'name' => 'Author' } }])
         end
       end
     end
@@ -142,22 +150,25 @@ describe Granite::Form::ActiveRecord::Associations do
         expect { user.profile = Profile.new(first_name: 'google.com') }
           .to change { user.profile }.from(nil).to(an_instance_of(Profile))
       end
+
       specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
         expect(user.reload.profile.first_name).to eq('google.com')
       end
+
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
-          .not_to change { user.read_attribute(:profile) }
+          .not_to(change { user.read_attribute(:profile) })
       end
+
       specify do
         expect do
           user.profile = Profile.new(first_name: 'google.com')
           user.save
         end
           .to change { user.reload.read_attribute(:profile) }.from(nil)
-          .to({first_name: 'google.com', last_name: nil, admin: nil}.to_json)
+          .to({ first_name: 'google.com', last_name: nil, admin: nil }.to_json)
       end
     end
   end
@@ -167,7 +178,8 @@ describe Granite::Form::ActiveRecord::Associations do
       expect do
         stub_class(:book, ActiveRecord::Base) do
           embeds_one :author, class_name: 'Borogoves'
-        end.reflect_on_association(:author).klass end.to raise_error NameError
+        end.reflect_on_association(:author).klass
+      end.to raise_error NameError
     end
 
     specify do
@@ -176,7 +188,8 @@ describe Granite::Form::ActiveRecord::Associations do
           embeds_many :projects, class_name: 'Borogoves' do
             attribute :title
           end
-        end.reflect_on_association(:projects).klass end.to raise_error NameError
+        end.reflect_on_association(:projects).klass
+      end.to raise_error NameError
     end
   end
 
@@ -194,13 +207,22 @@ describe Granite::Form::ActiveRecord::Associations do
 
     specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
     specify { expect(User.new.projects).to eq([]) }
-    specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to be_a(Granite::Form::Model::Associations::Collection::Embedded) }
-    specify { expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects).to match([have_attributes(title: 'Project')]) }
+
+    specify do
+      expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects)
+        .to be_a(Granite::Form::Model::Associations::Collection::Embedded)
+    end
+
+    specify do
+      expect(User.new.tap { |u| u.projects.build(title: 'Project') }.projects)
+        .to match([have_attributes(title: 'Project')])
+    end
 
     specify { expect(User.reflect_on_association(:profile).klass).to eq(User::Profile) }
     specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
     specify { expect(User.new.profile).to be_nil }
     specify { expect(User.new.tap { |u| u.build_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
+
     specify do
       expect(User.new.tap { |u| u.build_profile(first_name: 'Profile') }.profile)
         .to have_attributes(first_name: 'Profile', last_name: nil, admin: nil, age: nil)

@@ -23,9 +23,9 @@ describe Granite::Form::Model::Attributes::Represents do
   describe '#initialize' do
     before { Author.attribute :name, String, default: 'Default Name' }
 
-    let(:attributes) { {foo: 'bar'} }
+    let(:attributes) { { foo: 'bar' } }
 
-    it { expect { Model.new(attributes) }.to_not change { attributes } }
+    it { expect { Model.new(attributes) }.not_to(change { attributes }) }
 
     it { expect(attribute.read).to eq('Default Name') }
     it { expect(attribute.read_before_type_cast).to eq('Default Name') }

@@ -12,6 +12,7 @@ describe Granite::Form::Model::Attributes::Reflections::Base do
       described_class.build(Class.new, Target, :field)
       expect(Target).not_to be_method_defined(:field)
     end
+
     specify { expect(described_class.build(Class.new, Target, :field).name).to eq('field') }
   end
 

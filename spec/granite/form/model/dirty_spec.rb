@@ -45,16 +45,19 @@ describe Granite::Form::Model::Dirty do
     .tap { |m| m.update(author_id: author.id) }.changes)
       .to eq('author_id' => [other_author.id, author.id])
   end
+
   specify do
     expect(Model.instantiate(author_id: other_author.id)
     .tap { |m| m.update(author: author) }.changes)
       .to eq('author_id' => [other_author.id, author.id])
   end
+
   specify do
     expect(Model.instantiate(author_ids: [other_author.id])
     .tap { |m| m.update(author_ids: [author.id]) }.changes)
       .to eq('author_ids' => [[other_author.id], [author.id]])
   end
+
   specify do
     expect(Model.instantiate(author_ids: [other_author.id])
     .tap { |m| m.update(authors: [author]) }.changes)

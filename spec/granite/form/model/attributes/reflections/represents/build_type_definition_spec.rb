@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe Granite::Form::Model::Attributes::Reflections::Represents::BuildTypeDefinition do
   def build_type_definition(name = :name, **options)
-    @reflection = Granite::Form::Model::Attributes::Reflections::Represents.new(name, options.reverse_merge(of: :author))
+    @reflection = Granite::Form::Model::Attributes::Reflections::Represents.new(name,
+                                                                                options.reverse_merge(of: :author))
     described_class.new(owner, @reflection).call
   end
 
@@ -102,6 +103,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents::BuildTypeDef
     it { expect(build_type_definition(:status)).to have_type(Integer) }
     it { expect(build_type_definition(:full_name)).to have_type(String) }
     it { expect(build_type_definition(:unknown_attribute)).to have_type(Object) }
+
     it do
       attribute = build_type_definition(:related_ids)
       expect(attribute).to be_a(Granite::Form::Types::Collection)

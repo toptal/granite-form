@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Granite::Form::Types::Object do
   subject(:type) { build_type(reflection: reflection) }
+
   let(:model) { Model.new }
   let(:reflection) { build_reflection }
 
@@ -25,6 +26,7 @@ RSpec.describe Granite::Form::Types::Object do
 
   describe '#build_duplicate' do
     subject { type.build_duplicate(new_reflection, new_model) }
+
     let(:new_model) { double('new_model') }
     let(:new_reflection) { Granite::Form::Model::Attributes::Reflections::Base.new(:new_field) }
 

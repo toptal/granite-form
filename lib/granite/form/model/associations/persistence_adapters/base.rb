@@ -13,7 +13,8 @@ module Granite
             end
 
             def build(_attributes)
-              raise NotImplementedError, 'Should be implemented in inhereted adapter. Build new instance of data object by attributes'
+              raise NotImplementedError,
+                    'Should be implemented in inhereted adapter. Build new instance of data object by attributes'
             end
 
             def scope(_owner, _source)
@@ -29,11 +30,13 @@ module Granite
             end
 
             def identify(_object)
-              raise NotImplementedError, 'Should be implemented in inhereted adapter. Field to be used as primary_key for object'
+              raise NotImplementedError,
+                    'Should be implemented in inhereted adapter. Field to be used as primary_key for object'
             end
 
             def data_type
-              raise NotImplementedError, 'Should be implemented in inhereted adapter. Type of data object for type_check'
+              raise NotImplementedError,
+                    'Should be implemented in inhereted adapter. Type of data object for type_check'
             end
 
             def primary_key_type
@@ -41,7 +44,8 @@ module Granite
             end
 
             def referenced_proxy
-              raise NotImplementedError, 'Should be implemented in inhereted adapter. Object to manage proxying of methods to scope.'
+              raise NotImplementedError,
+                    'Should be implemented in inhereted adapter. Object to manage proxying of methods to scope.'
             end
           end
         end

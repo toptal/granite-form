@@ -26,11 +26,14 @@ module Granite
 
               unless trust && source.is_a?(self.class)
                 source.each do |entity|
-                  raise AssociationTypeMismatch.new(self.class._scope_model, entity.class) unless entity.is_a?(self.class._scope_model)
+                  unless entity.is_a?(self.class._scope_model)
+                    raise AssociationTypeMismatch.new(self.class._scope_model,
+                                                      entity.class)
+                  end
                 end
               end
 
-              super source
+              super(source)
             end
           end
 
@@ -38,7 +41,6 @@ module Granite
             super || self.class._scope_model.respond_to?(method)
           end
 
-          # rubocop:disable Style/MethodMissing
           # rubocop-0.52.1 doesn't understand that `#respond_to_missing?` is defined above
           if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0')
             def method_missing(method, *args, **kwargs, &block)
@@ -76,8 +78,6 @@ module Granite
               end
             end
           end
-          # rubocop:enable Style/MethodMissing
-
           def with_scope
             previous_scope = self.class._scope_model.current_scope
             self.class._scope_model.current_scope = self

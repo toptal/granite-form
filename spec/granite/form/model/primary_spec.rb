@@ -18,6 +18,7 @@ describe Granite::Form::Model::Primary do
 
     context do
       let(:object) { model.new(name: 'Hello') }
+
       specify { expect(object).not_to eq(object.clone.tap { |o| o.update(name: 'World') }) }
       specify { expect(object).not_to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
@@ -43,6 +44,7 @@ describe Granite::Form::Model::Primary do
 
     context do
       let(:object) { model.new(name: 'Hello') }
+
       specify { expect(object).to eq(object.clone.tap { |o| o.update(name: 'World') }) }
       specify { expect(object).to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
@@ -63,20 +65,33 @@ describe Granite::Form::Model::Primary do
     specify { expect(model.new.primary_attribute).to be_nil }
     specify { expect(model.new(name: 'Hello')).not_to eq(model.new(name: 'Hello')) }
     specify { expect(model.new(name: 'Hello')).not_to eql(model.new(name: 'Hello')) }
-    specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eq(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
-    specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eql(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
+
+    specify do
+      expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eq(model.new(name: 'Hello').tap do |o|
+                                                                        o.id = 2
+                                                                      end)
+    end
+
+    specify do
+      expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eql(model.new(name: 'Hello').tap do |o|
+                                                                         o.id = 2
+                                                                       end)
+    end
+
     specify { expect(model.new(id: 1).id).to be_nil }
     specify { expect(model.new.tap { |o| o.assign_attributes(id: 1) }.id).to be_nil }
     specify { expect(model.new.tap { |o| o.id = 1 }.id).to eq(1) }
 
     context do
       let(:object) { model.new(name: 'Hello').tap { |o| o.id = 1 } }
+
       specify { expect(object).to eq(object.clone.tap { |o| o.update(name: 'World') }) }
       specify { expect(object).to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
 
     context do
       let(:object) { model.new(name: 'Hello') }
+
       specify { expect(object).to eq(object) }
       specify { expect(object).to eql(object) }
     end

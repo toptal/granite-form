@@ -33,13 +33,16 @@ describe Granite::Form::Model::Validations::AssociatedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_one: { name: 'name' } }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_one: {} }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to(validated_one: ['is invalid'])
@@ -47,23 +50,28 @@ describe Granite::Form::Model::Validations::AssociatedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: { name: 'name' } }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', unvalidated_one: {} }
+
     it { is_expected.to be_valid }
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{name: 'name'}] }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ name: 'name' }] }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}] }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_many.0.name': ["can't be blank"], validated_many: ['is invalid'])
@@ -71,18 +79,22 @@ describe Granite::Form::Model::Validations::AssociatedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{name: 'name'}] }
+    subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{ name: 'name' }] }
+
     it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', unvalidated_many: [{}] }
+
     it { is_expected.to be_valid }
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{name: 'name'}], validated_one: {} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ name: 'name' }], validated_one: {} }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to(validated_one: ['is invalid'])
@@ -90,8 +102,10 @@ describe Granite::Form::Model::Validations::AssociatedValidator do
   end
 
   context do
-    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}], validated_one: {name: 'name'} }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}], validated_one: { name: 'name' } }
+
     it { is_expected.not_to be_valid }
+
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to('validated_many.0.name': ["can't be blank"], validated_many: ['is invalid'])

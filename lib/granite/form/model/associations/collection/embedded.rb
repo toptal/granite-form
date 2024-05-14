@@ -6,7 +6,7 @@ module Granite
           class Embedded < Proxy
             delegate :build, to: :@association
             delegate :delete, to: :target
-            alias_method :new, :build
+            alias new build
           end
         end
       end

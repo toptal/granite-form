@@ -30,7 +30,7 @@ module Granite
           false
         end
 
-      private
+        private
 
         def mark_persisted!
           @persisted = true

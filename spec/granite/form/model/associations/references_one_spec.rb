@@ -58,6 +58,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
     context do
       before { existing_association.reader.name = 'New' }
+
       specify do
         expect { existing_association.reload }
           .to change { existing_association.reader.name }
@@ -75,6 +76,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
   describe '#default' do
     before { Book.references_one :author, default: ->(_book) { author.id } }
+
     let(:existing_book) { Book.instantiate title: 'My Life' }
 
     specify { expect(association.target).to eq(author) }
@@ -83,7 +85,7 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
     specify { expect(existing_association.target).to be_nil }
     specify { expect { existing_association.replace(other) }.to change { existing_association.target }.to(other) }
-    specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
+    specify { expect { existing_association.replace(nil) }.not_to(change { existing_association.target }) }
   end
 
   describe '#writer' do
@@ -98,13 +100,15 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
       specify do
         expect { association.writer(nil) }
-          .not_to change { book.author_id }
+          .not_to(change { book.author_id })
       end
+
       specify do
         expect { association.writer(new_author) }
           .to change { muffle(NoMethodError) { association.reader.name } }
           .from(nil).to('Morty')
       end
+
       specify do
         expect { association.writer(new_author) }
           .not_to change { book.author_id }.from(nil)
@@ -121,17 +125,20 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }
+
       specify do
         expect { association.writer(nil) }
-          .not_to change { book.read_attribute(:author_id) }
+          .not_to(change { book.read_attribute(:author_id) })
       end
+
       specify do
         expect { association.writer(new_author) }
           .to change { association.reader }.from(nil).to(new_author)
       end
+
       specify do
         expect { association.writer(new_author) }
-          .to change { book.read_attribute(:author_id) }
+          .to(change { book.read_attribute(:author_id) })
       end
 
       context do
@@ -143,26 +150,30 @@ describe Granite::Form::Model::Associations::ReferencesOne do
 
         specify do
           expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer(Dummy.new) } }
-            .not_to change { existing_book.read_attribute(:author_id) }
+            .not_to(change { existing_book.read_attribute(:author_id) })
         end
+
         specify do
           expect { muffle(Granite::Form::AssociationTypeMismatch) { existing_association.writer(Dummy.new) } }
-            .not_to change { existing_association.reader }
+            .not_to(change { existing_association.reader })
         end
       end
 
       specify { expect(existing_association.writer(nil)).to be_nil }
       specify { expect(existing_association.writer(new_author)).to eq(new_author) }
+
       specify do
         expect { existing_association.writer(nil) }
           .to change { existing_book.read_attribute(:author_id) }
           .from(author.id).to(nil)
       end
+
       specify do
         expect { existing_association.writer(new_author) }
           .to change { existing_association.reader }
           .from(author).to(new_author)
       end
+
       specify do
         expect { existing_association.writer(new_author) }
           .to change { existing_book.read_attribute(:author_id) }

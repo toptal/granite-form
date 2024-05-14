@@ -19,7 +19,7 @@ module Granite
               attrs = attrs.to_unsafe_hash if attrs.respond_to?(:to_unsafe_hash)
               attrs = attrs.stringify_keys
               represented_attrs = self.class.represented_names_and_aliases
-                .each_with_object({}) do |name, result|
+                                      .each_with_object({}) do |name, result|
                 result[name] = attrs.delete(name) if attrs.key?(name)
               end
 
@@ -29,7 +29,7 @@ module Granite
             end
           end
 
-          alias_method :attributes=, :assign_attributes
+          alias attributes= assign_attributes
         end
 
         module ClassMethods
@@ -53,9 +53,9 @@ module Granite
           end
         end
 
-      private
+        private
 
-        def run_validations! #:nodoc:
+        def run_validations! # :nodoc:
           super
           emerge_represented_attributes_errors!
           errors.empty?

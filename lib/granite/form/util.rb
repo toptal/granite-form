@@ -41,7 +41,7 @@ module Granite
         end
       end
 
-    private
+      private
 
       def evaluate_proc(value, *args)
         instance_exec(*args, &value)

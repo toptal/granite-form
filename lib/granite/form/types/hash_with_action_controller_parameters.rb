@@ -4,13 +4,13 @@ module Granite
   module Form
     module Types
       class HashWithActionControllerParameters < Object
-      private
+        private
 
         def typecast(value)
           case value
           when ActionController::Parameters
             value.to_h if value.permitted?
-          when ::Hash then
+          when ::Hash
             value
           end
         end

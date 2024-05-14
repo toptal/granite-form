@@ -11,7 +11,7 @@ RSpec.describe Granite::Form::Types::HashWithActionControllerParameters do
       Class.new(ActionController::Base)
     end
 
-    let(:to_h) { {'x' => {'foo' => 'bar'}, 'y' => 2} }
+    let(:to_h) { { 'x' => { 'foo' => 'bar' }, 'y' => 2 } }
     let(:parameters) { ActionController::Parameters.new(to_h) }
 
     specify { expect(typecast(nil)).to be_nil }

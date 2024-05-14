@@ -58,6 +58,7 @@ module Granite
           def alias_association(alias_name, association_name)
             reflection = reflect_on_association(association_name)
             raise ArgumentError, "Can't alias undefined association `#{attribute_name}` on #{self}" unless reflection
+
             reflection.class.generate_methods alias_name, generated_associations_methods
             self._association_aliases = _association_aliases.merge(alias_name.to_sym => reflection.name)
             reflection
@@ -72,7 +73,7 @@ module Granite
             _associations.keys
           end
 
-        private
+          private
 
           def attributes_for_inspect
             (_associations.map do |name, reflection|
@@ -82,7 +83,7 @@ module Granite
 
           def generated_associations_methods
             @generated_associations_methods ||= const_set(:GeneratedAssociationsMethods, Module.new)
-              .tap { |proxy| include proxy }
+                                                .tap { |proxy| include proxy }
           end
         end
 
@@ -92,15 +93,16 @@ module Granite
           end
         end
 
-        alias_method :eql?, :==
+        alias eql? ==
 
         def association(name)
           reflection = self.class.reflect_on_association(name)
           return unless reflection
+
           (@_associations ||= {})[reflection.name] ||= reflection.build_association(self)
         end
 
-      private
+        private
 
         def attributes_for_inspect
           (association_names.map do |name|

@@ -34,9 +34,18 @@ describe Granite::Form::Model::Associations do
 
     describe '#reflect_on_association' do
       specify { expect(Nobody.reflect_on_association(:blabla)).to be_nil }
-      specify { expect(Admin.reflect_on_association('projects')).to be_a Granite::Form::Model::Associations::Reflections::EmbedsMany }
+
+      specify do
+        expect(Admin.reflect_on_association('projects'))
+          .to be_a Granite::Form::Model::Associations::Reflections::EmbedsMany
+      end
+
       specify { expect(Admin.reflect_on_association('own_projects').name).to eq(:admin_projects) }
-      specify { expect(Manager.reflect_on_association(:managed_project)).to be_a Granite::Form::Model::Associations::Reflections::EmbedsOne }
+
+      specify do
+        expect(Manager.reflect_on_association(:managed_project))
+          .to be_a Granite::Form::Model::Associations::Reflections::EmbedsOne
+      end
     end
   end
 
@@ -47,7 +56,8 @@ describe Granite::Form::Model::Associations do
           include Granite::Form::Model::Associations
 
           embeds_one :author, class_name: 'Borogoves'
-        end.reflect_on_association(:author).data_source end.to raise_error NameError
+        end.reflect_on_association(:author).data_source
+      end.to raise_error NameError
     end
 
     specify do
@@ -58,7 +68,8 @@ describe Granite::Form::Model::Associations do
           embeds_many :projects, class_name: 'Borogoves' do
             attribute :title
           end
-        end.reflect_on_association(:projects).data_source end.to raise_error NameError
+        end.reflect_on_association(:projects).data_source
+      end.to raise_error NameError
     end
   end
 
@@ -108,7 +119,9 @@ describe Granite::Form::Model::Associations do
     specify { expect(user.profile).to be_nil }
 
     describe '.inspect' do
-      specify { expect(User.inspect).to eq('User(profile: EmbedsOne(Profile), projects: EmbedsMany(Project), login: Object)') }
+      specify do
+        expect(User.inspect).to eq('User(profile: EmbedsOne(Profile), projects: EmbedsMany(Project), login: Object)')
+      end
     end
 
     describe '.association_names' do
@@ -118,9 +131,10 @@ describe Granite::Form::Model::Associations do
     describe '#inspect' do
       let(:profile) { Profile.new first_name: 'Name' }
       let(:project) { Project.new title: 'Project' }
+
       specify do
         expect(User.new(login: 'Login', profile: profile, projects: [project]).inspect)
-          .to eq('#<User profile: #<EmbedsOne #<Profile first_name: "Name", last_name: nil>>, projects: #<EmbedsMany [#<Project author: #<EmbedsOne nil>, title: "P...]>, login: "Login">')
+          .to eq('#<User profile: #<EmbedsOne #<Profile first_name: "Name", last_name: nil>>, projects: #<EmbedsMany [#<Project author: #<EmbedsOne nil>, title: "P...]>, login: "Login">') # rubocop:disable Layout/LineLength
       end
     end
 
@@ -137,7 +151,8 @@ describe Granite::Form::Model::Associations do
       specify { expect(User.new(projects: [project])).not_to eql(User.new) }
 
       context do
-        before { User.send(:include, Granite::Form::Model::Primary) }
+        before { User.include Granite::Form::Model::Primary }
+
         let(:user) { User.new(projects: [project]) }
 
         specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: project) }) }
@@ -161,13 +176,17 @@ describe Granite::Form::Model::Associations do
     end
 
     describe '#instantiate' do
-      before { User.send(:include, Granite::Form::Model::Persistence) }
+      before do
+        User.include Granite::Form::Model::Persistence
+        project.build_author(name: 'Author')
+      end
+
       let(:profile) { Profile.new first_name: 'Name' }
       let(:project) { Project.new title: 'Project' }
       let(:user) { User.new(profile: profile, projects: [project]) }
-      before { project.build_author(name: 'Author') }
 
       specify { expect(User.instantiate(JSON.parse(user.to_json))).to eq(user) }
+
       specify do
         expect(User.instantiate(JSON.parse(user.to_json))
         .tap { |u| u.projects.first.author.name = 'Other' }).not_to eq(user)

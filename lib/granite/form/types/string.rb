@@ -4,7 +4,7 @@ module Granite
   module Form
     module Types
       class String < Object
-      private
+        private
 
         def typecast(value)
           value.to_s

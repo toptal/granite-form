@@ -11,7 +11,7 @@ RSpec.describe Granite::Form::Types::Date do
     specify { expect(typecast('2013-06-13')).to eq(date) }
     specify { expect(typecast('2013-55-55')).to be_nil }
     specify { expect(typecast('blablabla')).to be_nil }
-    specify { expect(typecast(DateTime.new(2013, 6, 13, 23, 13))).to eq(date) } # rubocop:disable Style/DateTime
+    specify { expect(typecast(DateTime.new(2013, 6, 13, 23, 13))).to eq(date) }
     specify { expect(typecast(Time.new(2013, 6, 13, 23, 13))).to eq(date) }
     specify { expect(typecast(Date.new(2013, 6, 13))).to eq(date) }
   end

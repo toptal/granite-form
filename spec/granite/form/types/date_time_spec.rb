@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Granite::Form::Types::DateTime do
-  # rubocop:disable Style/DateTime
   describe 'typecasting' do
     include_context 'type setup', 'DateTime'
     let(:datetime) { DateTime.new(2013, 6, 13, 23, 13) }
@@ -16,5 +15,4 @@ RSpec.describe Granite::Form::Types::DateTime do
     specify { expect(typecast(Time.utc(2013, 6, 13, 23, 13).utc)).to eq(datetime) }
     specify { expect(typecast(DateTime.new(2013, 6, 13, 23, 13))).to eq(datetime) }
   end
-  # rubocop:enable Style/DateTime
 end

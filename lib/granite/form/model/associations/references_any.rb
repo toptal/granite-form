@@ -7,7 +7,7 @@ module Granite
             reflection.persistence_adapter.scope(owner, source)
           end
 
-        private
+          private
 
           def read_source
             attribute.read_before_type_cast

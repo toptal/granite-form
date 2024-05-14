@@ -31,10 +31,10 @@ module Granite
 
             def klass
               @klass ||= if options[:class]
-                options[:class].call(self)
-              else
-                super
-              end
+                           options[:class].call(self)
+                         else
+                           super
+                         end
             end
 
             def inspect

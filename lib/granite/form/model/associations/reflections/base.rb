@@ -10,13 +10,14 @@ module Granite
             attr_reader :name, :options
             # AR compatibility
             attr_accessor :parent_reflection
+
             delegate :association_class, to: 'self.class'
 
             def self.build(target, generated_methods, name, options = {}, &_block)
               generate_methods name, generated_methods
               if options.delete(:validate) &&
-                  target.respond_to?(:validates_nested) &&
-                  !target.validates_nested?(name)
+                 target.respond_to?(:validates_nested) &&
+                 !target.validates_nested?(name)
                 target.validates_nested name
               end
               new(name, options)
