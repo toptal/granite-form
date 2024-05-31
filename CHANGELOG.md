@@ -2,7 +2,10 @@
 
 ## Next
 
+## v0.6.0
+
 * Fix crash when mapping PostgreSQL enum to ruby variable in https://github.com/toptal/granite-form/pull/28
+* Lower severity of the log message during mass assignment https://github.com/toptal/granite-form/pull/26
 
 ## v0.5.0
 
