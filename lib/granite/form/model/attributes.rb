@@ -212,11 +212,9 @@ module Granite
         private
 
         def report_unknown_attribute(attribute_type, name)
-          if self.class.mass_assignment_strict_mode
-            raise ActiveModel::UnknownAttributeError.new(self, name.to_s)
-          else
-            logger.debug("Ignoring #{attribute_type} `#{name}` attribute value for #{self} during mass-assignment")
-          end
+          raise ActiveModel::UnknownAttributeError.new(self, name.to_s) if self.class.mass_assignment_strict_mode
+
+          logger.debug("Ignoring #{attribute_type} `#{name}` attribute value for #{self} during mass-assignment")
         end
 
         def attributes_for_inspect
