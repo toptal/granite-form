@@ -16,10 +16,13 @@ module Granite
         extend ActiveSupport::Concern
 
         included do
-          class_attribute :_attributes, :_attribute_aliases, :_sanitize, instance_reader: false, instance_writer: false
+          class_attribute :_attributes, :_attribute_aliases, :_sanitize,
+                          :mass_assignment_strict_mode,
+                          instance_reader: false, instance_writer: false
           self._attributes = {}
           self._attribute_aliases = {}
           self._sanitize = true
+          self.mass_assignment_strict_mode = false
 
           delegate :attribute_names, :has_attribute?, to: 'self.class'
 
@@ -180,7 +183,7 @@ module Granite
               public_send("#{name}=", value)
             else
               attribute_type = sanitize_value ? 'primary' : 'undefined'
-              logger.debug("Ignoring #{attribute_type} `#{name}` attribute value for #{self} during mass-assignment")
+              report_unknown_attribute(attribute_type, name)
             end
           end
         end
@@ -207,6 +210,12 @@ module Granite
         end
 
         private
+
+        def report_unknown_attribute(attribute_type, name)
+          raise ActiveModel::UnknownAttributeError.new(self, name.to_s) if self.class.mass_assignment_strict_mode
+
+          logger.debug("Ignoring #{attribute_type} `#{name}` attribute value for #{self} during mass-assignment")
+        end
 
         def attributes_for_inspect
           attribute_names(false).map do |name|

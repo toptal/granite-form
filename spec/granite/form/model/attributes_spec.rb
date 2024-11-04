@@ -206,6 +206,27 @@ describe Granite::Form::Model::Attributes do
         end
       end
     end
+
+    context 'with mass_assignment_strict_mode' do
+      let(:model) do
+        stub_model do
+          self.mass_assignment_strict_mode = true
+          attribute :full_name, String
+          alias_attribute :name, :full_name
+        end
+      end
+
+      specify do
+        expect do
+          subject.assign_attributes(name: 'name', unexisting: 'value')
+        end.to raise_error(ActiveModel::UnknownAttributeError, /unknown attribute 'unexisting' for/)
+      end
+
+      specify do
+        subject.assign_attributes(name: 'name', full_name: 'full_name')
+        expect(subject.name).to eq('full_name')
+      end
+    end
   end
 
   describe '#sync_attributes' do
