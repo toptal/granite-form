@@ -2,6 +2,13 @@
 
 ## Next
 
+## v0.6.1
+
+* Introduces `mass_assignment_strict_mode` configuration option to control the behavior of mass assignment.
+  * The setting is per class and configures strict handling of unknown attributes by raising an exception.
+  * By default it is disabled, and you need to opt-in.
+  * https://github.com/toptal/granite-form/pull/32
+
 ## v0.6.0
 
 * Fix crash when mapping PostgreSQL enum to ruby variable in https://github.com/toptal/granite-form/pull/28
