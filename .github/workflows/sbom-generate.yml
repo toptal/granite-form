@@ -1,0 +1,19 @@
+name: SBOM generation
+on:
+  push:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  call_sbom_generation:
+    runs-on: org-toptal-ubuntu2204-x64-2xsmall
+    permissions:
+      contents: read
+    steps:
+      - uses: toptal/actions/sbom-generate@main
+        name: SBOM generate report
+        with:
+          apiKey: ${{ secrets.TOPTAL_DTRACK_API_KEY }}
+          url: ${{ secrets.TOPTAL_DTRACK_URL }}
