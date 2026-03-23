@@ -26,6 +26,7 @@ describe Granite::Form::Model::Scopes do
   let(:hash_scoped_model) do
     stub_model do
       include Granite::Form::Model::Scopes
+
       scopify Hash
     end
   end

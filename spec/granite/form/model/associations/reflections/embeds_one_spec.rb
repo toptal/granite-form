@@ -5,6 +5,7 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsOne do
     stub_model(:author) do
       include Granite::Form::Model::Persistence
       include Granite::Form::Model::Associations
+
       attribute :name, String
     end
 

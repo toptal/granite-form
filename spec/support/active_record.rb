@@ -5,7 +5,7 @@ ActiveRecord::Base.establish_connection(
   password: 'granite',
   host: 'localhost'
 )
-ActiveRecord::Base.logger = Logger.new('/dev/null')
+ActiveRecord::Base.logger = Logger.new(File::NULL)
 
 ActiveRecord::Schema.define do
   create_table :users, force: :cascade do |t|

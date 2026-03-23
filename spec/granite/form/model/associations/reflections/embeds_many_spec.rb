@@ -5,6 +5,7 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
     stub_model(:project) do
       include Granite::Form::Model::Persistence
       include Granite::Form::Model::Associations
+
       attribute :title, String
     end
     stub_model(:user) do
@@ -58,7 +59,12 @@ describe Granite::Form::Model::Associations::Reflections::EmbedsMany do
       let(:project) { Project.new title: 'Project' }
 
       specify { expect(user.projects.build(title: 'Project')).to eq(project) }
-      specify { expect { user.projects.build(title: 'Project') }.to change { user.projects.to_a }.from([]).to([project]) }
+
+      specify do
+        expect { user.projects.build(title: 'Project') }.to change {
+          user.projects.to_a
+        }.from([]).to([project])
+      end
     end
 
     describe '#reload' do

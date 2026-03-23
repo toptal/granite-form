@@ -49,6 +49,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         collection :author_names, String
         references_many :authors, primary_key: 'name'
       end
@@ -71,6 +72,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_many :authors, reference_key: 'identify'
       end
     end
@@ -93,6 +95,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_many :authors
           references_many :owners, class_name: 'Author', default: default
         end
@@ -129,6 +132,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_many :authors
           references_many :owners, class_name: 'Author', default: default
         end
@@ -140,7 +144,13 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       specify { expect(book.owner_ids).to eq([nil]) }
       specify { expect(book.owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
       specify { expect { book.owners = [other] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
-      specify { expect { book.owners = [other] }.to change { book.owners.to_a }.from([an_instance_of(Author)]).to([other]) }
+
+      specify do
+        expect { book.owners = [other] }.to change {
+          book.owners.to_a
+        }.from([an_instance_of(Author)]).to([other])
+      end
+
       specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
 
       specify do
@@ -178,6 +188,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_many :authors, ->(owner) { name_starts_with(owner.letter) }
         attribute :letter, String
       end

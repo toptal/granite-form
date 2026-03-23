@@ -220,6 +220,7 @@ describe Granite::Form::Model::Associations::EmbedsMany do
       User.embeds_many :projects, default: -> { { title: 'Default' } }
       Project.class_eval do
         include Granite::Form::Model::Primary
+
         primary :title
       end
     end

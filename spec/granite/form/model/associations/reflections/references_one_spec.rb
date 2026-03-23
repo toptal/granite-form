@@ -46,6 +46,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         attribute :author_name, String
         references_one :author, primary_key: 'name'
       end
@@ -68,6 +69,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_one :author, reference_key: 'identify'
       end
     end
@@ -90,6 +92,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_one :author
           references_one :owner, class_name: 'Author', default: default
         end
@@ -120,6 +123,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_one :author
           references_one :owner, class_name: 'Author', default: default
         end
@@ -154,6 +158,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_one :author, ->(owner) { name_starts_with(owner.letter) }
         attribute :letter, String
       end
@@ -254,6 +259,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
         before { book.author = author }
 
         specify { expect { author.save! }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
+
         specify do
           expect { author.save! }.not_to(change { book.author&.object_id })
         end

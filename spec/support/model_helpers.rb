@@ -3,8 +3,8 @@ module ModelHelpers
     stub_class(name, superclass) { include Granite::Form::Model }.tap { |klass| klass.class_eval(&block) if block }
   end
 
-  def stub_class(name = nil, superclass = nil, &block)
-    klass = superclass ? Class.new(superclass, &block) : Class.new(&block)
+  def stub_class(name = nil, superclass = nil, &)
+    klass = superclass ? Class.new(superclass, &) : Class.new(&)
     name.present? ? stub_const(name.to_s.camelize, klass) : klass
   end
 end

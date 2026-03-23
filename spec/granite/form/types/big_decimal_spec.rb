@@ -9,6 +9,7 @@ RSpec.describe Granite::Form::Types::BigDecimal do
     specify { expect(typecast('hello')).to be_nil }
     specify { expect(typecast('123hello')).to be_nil }
     specify { expect(typecast('123')).to eq(BigDecimal('123.0')) }
+
     if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.4')
       specify { expect(typecast('123.')).to eq(BigDecimal('123.0')) }
     else

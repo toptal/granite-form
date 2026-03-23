@@ -41,6 +41,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents::BuildTypeDef
       end
       Author.class_eval do
         include Granite::Form::Model::Representation
+
         represents :name, of: :subject
 
         def subject
@@ -57,6 +58,7 @@ describe Granite::Form::Model::Attributes::Reflections::Represents::BuildTypeDef
       stub_class(:user, ActiveRecord::Base)
       Author.class_eval do
         include Granite::Form::Model::Associations
+
         references_many :users
       end
     end

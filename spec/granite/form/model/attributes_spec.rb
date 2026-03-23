@@ -41,6 +41,7 @@ describe Granite::Form::Model::Attributes do
     specify do
       expect(stub_model do
                include Granite::Form::Model::Primary
+
                primary :count, Integer
                attribute :object, Object
              end.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/)
@@ -49,6 +50,7 @@ describe Granite::Form::Model::Attributes do
     specify do
       expect(stub_model(:user) do
                include Granite::Form::Model::Primary
+
                primary :count, Integer
                attribute :object, Object
              end.inspect).to match('User(*count: Integer, object: Object)')
@@ -265,6 +267,7 @@ describe Granite::Form::Model::Attributes do
     specify do
       expect(stub_model do
                include Granite::Form::Model::Primary
+
                primary :count, Integer
                attribute :object, Object
              end.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/)
@@ -273,6 +276,7 @@ describe Granite::Form::Model::Attributes do
     specify do
       expect(stub_model(:user) do
                include Granite::Form::Model::Primary
+
                primary :count, Integer
                attribute :object, Object
              end.new.inspect).to match(/#<User \*count: nil, object: nil>/)
@@ -287,6 +291,7 @@ describe Granite::Form::Model::Attributes do
         include Granite::Form::Util
         include Granite::Form::Model::Attributes
         include Granite::Form::Model::Associations
+
         attr_accessor :name
 
         attribute :id, Integer
@@ -297,7 +302,7 @@ describe Granite::Form::Model::Attributes do
         attribute :enum, Integer, enum: [1, 2, 3]
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: '2'
         attribute :foo, Boolean, default: false
-        collection :array, Integer, enum: [1, 2, 3], default: [2], normalizer: ->(v) { v.uniq }
+        collection :array, Integer, enum: [1, 2, 3], default: [2], normalizer: lambda(&:uniq)
         dictionary :dict, Integer, keys: %w[from to], enum: [1, 2, 3], default: { from: 1 }, normalizer: proc { |v|
           next v if v[:from].nil? || v[:to].nil? || v[:from] <= v[:to]
 
@@ -442,6 +447,7 @@ describe Granite::Form::Model::Attributes do
     let!(:ancestor) do
       Class.new do
         include Granite::Form::Model::Attributes
+
         attribute :foo, String
       end
     end

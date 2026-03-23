@@ -14,7 +14,7 @@ describe Granite::Form::Model::Associations::NestedAttributes do
       end
     end
 
-    include_examples 'nested attributes'
+    it_behaves_like 'nested attributes'
   end
 
   describe '#assign_attributes' do
