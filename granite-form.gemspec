@@ -1,4 +1,4 @@
-require File.expand_path('../lib/granite/form/version', __FILE__)
+require File.expand_path('lib/granite/form/version', __dir__)
 
 Gem::Specification.new do |gem|
   gem.authors = ['Toptal Engineering']
@@ -11,20 +11,21 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.required_ruby_version = '>= 3.3'
   gem.version = Granite::Form::VERSION
+  gem.metadata['rubygems_mfa_required'] = 'true'
 
   gem.add_development_dependency 'actionpack', '>= 7.2'
   gem.add_development_dependency 'activerecord', '>= 7.2'
   gem.add_development_dependency 'database_cleaner'
   gem.add_development_dependency 'pg'
+  gem.add_development_dependency 'pry'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rubocop'
   gem.add_development_dependency 'rubocop-rspec'
   gem.add_development_dependency 'uuidtools'
-  gem.add_development_dependency 'pry'
 
-  gem.add_runtime_dependency 'activemodel', '>= 7.2'
-  gem.add_runtime_dependency 'activesupport', '>= 7.2'
-  gem.add_runtime_dependency 'tzinfo'
+  gem.add_dependency 'activemodel', '>= 7.2'
+  gem.add_dependency 'activesupport', '>= 7.2'
+  gem.add_dependency 'tzinfo'
 end
