@@ -43,11 +43,11 @@ module Granite
 
           # rubocop-0.52.1 doesn't understand that `#respond_to_missing?` is defined above
           if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0')
-            def method_missing(method, *args, **kwargs, &block)
+            def method_missing(method, ...)
               with_scope do
                 model = self.class._scope_model
                 if model.respond_to?(method)
-                  result = model.public_send(method, *args, **kwargs, &block)
+                  result = model.public_send(method, ...)
                   result.is_a?(Granite::Form::Model::Scopes) ? result : model.scope_class.new(result)
                 else
                   super
@@ -55,11 +55,11 @@ module Granite
               end
             end
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0')
-            def method_missing(method, *args, **kwargs, &block)
+            def method_missing(method, ...)
               with_scope do
                 model = self.class._scope_model
                 if model.respond_to?(method)
-                  model.public_send(method, *args, **kwargs, &block)
+                  model.public_send(method, ...)
                 else
                   super
                 end

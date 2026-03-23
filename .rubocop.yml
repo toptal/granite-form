@@ -41,3 +41,9 @@ Style/OptionalBooleanParameter:
 
 Style/MissingRespondToMissing:
   Enabled: false
+
+Style/ArgumentsForwarding:
+  Enabled: false
+
+Naming/BlockForwarding:
+  Enabled: false

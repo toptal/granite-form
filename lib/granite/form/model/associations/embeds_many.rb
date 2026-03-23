@@ -22,7 +22,7 @@ module Granite
             unless evar_loaded?
               default = Array.wrap(reflection.default(owner))
               if default.present?
-                collection = if default.all? { |object| object.is_a?(reflection.klass) }
+                collection = if default.all?(reflection.klass)
                                default
                              else
                                default.map do |attributes|
@@ -46,7 +46,7 @@ module Granite
             write_source(target.map { |model| model_data(model) })
           end
 
-          def clear
+          def clear # rubocop:disable Naming/PredicateMethod
             target
             @target = []
             true

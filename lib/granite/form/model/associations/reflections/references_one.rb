@@ -9,7 +9,7 @@ module Granite
           class ReferencesOne < ReferencesAny
             include Singular
 
-            def self.build(target, generated_methods, name, *args, &block)
+            def self.build(target, generated_methods, name, *args, &_block)
               reflection = super
 
               target.add_attribute(

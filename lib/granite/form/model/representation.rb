@@ -25,7 +25,7 @@ module Granite
 
               super(attrs.merge!(represented_attrs))
             else
-              super(attrs)
+              super
             end
           end
 
@@ -41,9 +41,7 @@ module Granite
           end
 
           def represented_attributes
-            @represented_attributes ||= _attributes.values.select do |attribute|
-              attribute.is_a? Granite::Form::Model::Attributes::Reflections::Represents
-            end
+            @represented_attributes ||= _attributes.values.grep(Granite::Form::Model::Attributes::Reflections::Represents)
           end
 
           def represented_names_and_aliases
@@ -55,7 +53,7 @@ module Granite
 
         private
 
-        def run_validations! # :nodoc:
+        def run_validations! # rubocop:disable Naming/PredicateMethod
           super
           emerge_represented_attributes_errors!
           errors.empty?

@@ -29,7 +29,7 @@ module Granite
 
                 super(attrs.merge!(nested_attrs))
               else
-                super(attrs)
+                super
               end
             end
 
@@ -232,6 +232,7 @@ module Granite
               @nested_attributes_methods_module ||= begin
                 mod = const_set(:NestedAttributesMethods, Module.new)
                 include(mod)
+
                 mod
               end
             end

@@ -20,9 +20,9 @@ module Granite
 
             return [] unless default
 
-            if default.all? { |object| object.is_a?(reflection.persistence_adapter.data_type) }
+            if default.all?(reflection.persistence_adapter.data_type)
               default
-            elsif default.all? { |object| object.is_a?(Hash) }
+            elsif default.all?(Hash)
               default.map { |attributes| build_object(attributes) }
             else
               reflection.persistence_adapter.find_all(owner, default)
@@ -49,7 +49,7 @@ module Granite
             reader
           end
 
-          def clear
+          def clear # rubocop:disable Naming/PredicateMethod
             attribute.pollute do
               write_source([])
             end
