@@ -383,21 +383,21 @@ describe Granite::Form::Model::Associations::EmbedsMany do
         muffle(Granite::Form::AssociationTypeMismatch) do
           existing_association.writer([new_project1, Dummy.new, new_project2])
         end
-      end.not_to(change { existing_association.reader })
+      end.not_to(change { existing_association.reader.map(&:attributes) })
     end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
 
     specify do
       expect { muffle(NoMethodError) { existing_association.writer(nil) } }
-        .not_to(change { existing_association.reader })
+        .not_to(change { existing_association.reader.map(&:attributes) })
     end
 
     specify { expect(existing_association.writer([])).to eq([]) }
 
     specify do
       expect { existing_association.writer([]) }
-        .to change { existing_association.reader }.to([])
+        .to change { existing_association.reader.to_a }.to([])
     end
 
     specify { expect(existing_association.writer([new_project1, new_project2])).to eq([new_project1, new_project2]) }

@@ -254,7 +254,9 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesOne do
         before { book.author = author }
 
         specify { expect { author.save! }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
-        specify { expect { author.save! }.not_to(change { book.author }) }
+        specify do
+          expect { author.save! }.not_to(change { book.author&.object_id })
+        end
       end
     end
   end

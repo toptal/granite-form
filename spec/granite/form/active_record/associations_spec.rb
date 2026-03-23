@@ -31,7 +31,7 @@ describe Granite::Form::ActiveRecord::Associations do
       embeds_one :profile
 
       # Simulating JSON attribute
-      serialize :projects, JSON
+      serialize :projects, coder: JSON
 
       def read_attribute(name)
         if name.to_s == 'projects'

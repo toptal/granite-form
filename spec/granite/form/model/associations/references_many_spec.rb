@@ -168,7 +168,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
           existing_association.writer([new_author1, Dummy.new, new_author2])
         end
       end
-        .not_to(change { existing_association.reader })
+        .not_to(change { existing_association.reader.to_a })
     end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
@@ -180,7 +180,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
 
     specify do
       expect { muffle(NoMethodError) { existing_association.writer(nil) } }
-        .not_to(change { existing_association.reader })
+        .not_to(change { existing_association.reader.to_a })
     end
 
     specify { expect(existing_association.writer([])).to eq([]) }
@@ -192,7 +192,7 @@ describe Granite::Form::Model::Associations::ReferencesMany do
 
     specify do
       expect { existing_association.writer([]) }
-        .to change { existing_association.reader }.from([author]).to([])
+        .to change { existing_association.reader.to_a }.from([author]).to([])
     end
 
     specify { expect(existing_association.writer([new_author1, new_author2])).to eq([new_author1, new_author2]) }
