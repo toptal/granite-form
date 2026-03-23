@@ -2,6 +2,12 @@
 
 ## Next
 
+* [BREAKING] Drop support for Rails < 7.2 and Ruby < 3.3
+* [BREAKING] Remove Rails < 7.2 compatibility branches for error handling in `Representation` and `NestedValidator`
+* Add support for Rails 7.2, 8.0, and 8.1
+* Remove Guard gems and Guardfile
+* Update RuboCop configuration and resolve offenses
+
 ## v0.6.1
 
 * Introduces `mass_assignment_strict_mode` configuration option to control the behavior of mass assignment.
