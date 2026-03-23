@@ -21,16 +21,12 @@ ActiveRecord::Schema.define do
     t.column :data, :text
   end
 
-  if ActiveModel.version >= Gem::Version.new('7.0.0')
-    create_enum 'foo', %w[foo bar baz]
+  create_enum 'foo', %w[foo bar baz]
 
-    create_table :foo_containers, force: :cascade do |t|
-      t.enum :foos, enum_type: 'foo', array: true
-    end
+  create_table :foo_containers, force: :cascade do |t|
+    t.enum :foos, enum_type: 'foo', array: true
   end
 end
 
-if ActiveModel.version >= Gem::Version.new('7.0.0')
-  class FooContainer < ActiveRecord::Base
-  end
+class FooContainer < ActiveRecord::Base
 end
