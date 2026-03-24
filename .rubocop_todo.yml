@@ -135,15 +135,6 @@ RSpec/ExpectChange:
     - 'spec/granite/form/model/representation_spec.rb'
     - 'spec/support/shared/nested_attribute_examples.rb'
 
-# Offense count: 3
-# Configuration parameters: Include, CustomTransform, IgnoreMethods, SpecSuffixOnly.
-# Include: **/*_spec*rb*, **/spec/**/*
-RSpec/FilePath:
-  Exclude:
-    - 'spec/granite/form/extensions_spec.rb'
-    - 'spec/granite/form/model/validations/associated_spec.rb'
-    - 'spec/granite/form/model/validations/nested_spec.rb'
-
 # Offense count: 6
 RSpec/IdenticalEqualityAssertion:
   Exclude:
@@ -248,14 +239,6 @@ RSpec/VerifiedDoubles:
 RSpec/VoidExpect:
   Exclude:
     - 'spec/granite/form/model/attributes_spec.rb'
-
-# Offense count: 1
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: not_to, be_invalid
-RSpecRails/NegationBeValid:
-  Exclude:
-    - 'spec/granite/form/model/validations_spec.rb'
 
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).

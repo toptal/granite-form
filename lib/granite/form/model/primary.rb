@@ -3,6 +3,7 @@ module Granite
     module Model
       module Primary
         extend ActiveSupport::Concern
+
         DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = lambda do
           {
             type: Granite::Form::UUID,
@@ -15,6 +16,7 @@ module Granite
           delegate :has_primary_attribute?, to: 'self.class'
 
           prepend PrependMethods
+
           alias_method :eql?, :==
         end
 
@@ -31,7 +33,7 @@ module Granite
 
           alias primary_attribute primary
 
-          def has_primary_attribute? # rubocop:disable Naming/PredicateName
+          def has_primary_attribute? # rubocop:disable Naming/PredicatePrefix
             has_attribute? _primary_name
           end
 
@@ -49,7 +51,7 @@ module Granite
                 object_id == other.object_id
               end
             else
-              super(other)
+              super
             end
           end
         end

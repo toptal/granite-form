@@ -25,7 +25,7 @@ module Granite
 
               super(attrs.merge!(represented_attrs))
             else
-              super(attrs)
+              super
             end
           end
 
@@ -41,9 +41,7 @@ module Granite
           end
 
           def represented_attributes
-            @represented_attributes ||= _attributes.values.select do |attribute|
-              attribute.is_a? Granite::Form::Model::Attributes::Reflections::Represents
-            end
+            @represented_attributes ||= _attributes.values.grep(Granite::Form::Model::Attributes::Reflections::Represents)
           end
 
           def represented_names_and_aliases
@@ -55,7 +53,7 @@ module Granite
 
         private
 
-        def run_validations! # :nodoc:
+        def run_validations! # rubocop:disable Naming/PredicateMethod
           super
           emerge_represented_attributes_errors!
           errors.empty?
@@ -75,26 +73,16 @@ module Granite
           end
         end
 
-        if ActiveModel.version >= Gem::Version.new('6.1.0')
-          def move_errors(from, to)
-            errors.where(from).each do |error|
-              options = error.options
-              # If we generate message for built-in validation, we don't want to later escape it in our monkey-patch
-              options = options.merge(message: error.message.html_safe)
+        def move_errors(from, to)
+          errors.where(from).each do |error|
+            options = error.options
+            # If we generate message for built-in validation, we don't want to later escape it in our monkey-patch
+            options = options.merge(message: error.message.html_safe)
 
-              errors.add(to, error.type, **options)
-            end
-
-            errors.delete(from)
+            errors.add(to, error.type, **options)
           end
-        else
-          # up to 6.0.x
-          def move_errors(from, to)
-            return unless errors.messages.key?(from) && errors.messages[from].present?
 
-            errors[to].concat(errors.messages[from])
-            errors.delete(from)
-          end
+          errors.delete(from)
         end
       end
     end

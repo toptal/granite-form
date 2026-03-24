@@ -41,43 +41,18 @@ module Granite
             super || self.class._scope_model.respond_to?(method)
           end
 
-          # rubocop-0.52.1 doesn't understand that `#respond_to_missing?` is defined above
-          if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0')
-            def method_missing(method, *args, **kwargs, &block)
-              with_scope do
-                model = self.class._scope_model
-                if model.respond_to?(method)
-                  result = model.public_send(method, *args, **kwargs, &block)
-                  result.is_a?(Granite::Form::Model::Scopes) ? result : model.scope_class.new(result)
-                else
-                  super
-                end
-              end
-            end
-          elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0')
-            def method_missing(method, *args, **kwargs, &block)
-              with_scope do
-                model = self.class._scope_model
-                if model.respond_to?(method)
-                  model.public_send(method, *args, **kwargs, &block)
-                else
-                  super
-                end
-              end
-            end
-          else
-            # up to 2.6.x
-            def method_missing(method, *args, &block)
-              with_scope do
-                model = self.class._scope_model
-                if model.respond_to?(method)
-                  model.public_send(method, *args, &block)
-                else
-                  super
-                end
+          def method_missing(method, ...)
+            with_scope do
+              model = self.class._scope_model
+              if model.respond_to?(method)
+                result = model.public_send(method, ...)
+                result.is_a?(Granite::Form::Model::Scopes) ? result : model.scope_class.new(result)
+              else
+                super
               end
             end
           end
+
           def with_scope
             previous_scope = self.class._scope_model.current_scope
             self.class._scope_model.current_scope = self

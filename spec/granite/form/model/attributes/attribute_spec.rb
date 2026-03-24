@@ -30,7 +30,7 @@ describe Granite::Form::Model::Attributes::Attribute do
   end
 
   describe '#read_before_type_cast' do
-    let(:field) { attribute(type: String, normalizer: ->(v) { v.strip }, default: :world, enum: %w[hello 42 world]) }
+    let(:field) { attribute(type: String, normalizer: lambda(&:strip), default: :world, enum: %w[hello 42 world]) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
     specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
@@ -65,16 +65,16 @@ describe Granite::Form::Model::Attributes::Attribute do
 
   describe '#normalize' do
     specify { expect(attribute.normalize(' hello ')).to eq(' hello ') }
-    specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }
+    specify { expect(attribute(normalizer: lambda(&:strip)).normalize(' hello ')).to eq('hello') }
 
     specify do
-      normalizers = [->(v) { v.strip }, ->(v) { v.first(4) }]
+      normalizers = [lambda(&:strip), ->(v) { v.first(4) }]
       attr = attribute(normalizer: normalizers)
       expect(attr.normalize(' hello ')).to eq('hell')
     end
 
     specify do
-      normalizers = [->(v) { v.first(4) }, ->(v) { v.strip }]
+      normalizers = [->(v) { v.first(4) }, lambda(&:strip)]
       attr = attribute(normalizer: normalizers)
       expect(attr.normalize(' hello ')).to eq('hel')
     end

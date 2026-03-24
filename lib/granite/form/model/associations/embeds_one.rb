@@ -44,7 +44,7 @@ module Granite
             write_source(model_data(target))
           end
 
-          def clear
+          def clear # rubocop:disable Naming/PredicateMethod
             target
             @target = nil
             true

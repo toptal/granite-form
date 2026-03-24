@@ -49,7 +49,7 @@ module Granite
             !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
           end
 
-          def query
+          def query # rubocop:disable Naming/PredicateMethod
             !(read.respond_to?(:zero?) ? read.zero? : read.blank?)
           end
 

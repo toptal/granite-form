@@ -25,9 +25,9 @@ module Granite
             association_names.each do |name|
               association = association(name)
               invalid_block = if association.reflection.klass.method_defined?(:invalid_ansestry?)
-                                ->(object) { object.invalid_ansestry? }
+                                lambda(&:invalid_ansestry?)
                               else
-                                ->(object) { object.invalid? }
+                                lambda(&:invalid?)
                               end
 
               Granite::Form::Model::Validations::NestedValidator

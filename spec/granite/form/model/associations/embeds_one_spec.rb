@@ -182,6 +182,7 @@ describe Granite::Form::Model::Associations::EmbedsOne do
       Book.embeds_one :author, default: -> { { name: 'Default' } }
       Author.class_eval do
         include Granite::Form::Model::Primary
+
         primary :name
       end
     end

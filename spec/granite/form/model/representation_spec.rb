@@ -34,9 +34,7 @@ describe Granite::Form::Model::Representation do
     specify { expect(Post.new.rate).to be_nil }
     specify { expect(Post.new.rate_before_type_cast).to be_nil }
 
-    if ActiveModel.version >= Gem::Version.new('7.0.0')
-      specify { expect { Post.new(foo_container: FooContainer.new, foos: foos) }.not_to raise_exception }
-    end
+    specify { expect { Post.new(foo_container: FooContainer.new, foos: foos) }.not_to raise_exception }
 
     context 'ActionController::Parameters' do
       let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: { rate: '33', author: author }) }
@@ -136,11 +134,9 @@ describe Granite::Form::Model::Representation do
         .to('author.user.email': ['is invalid'], name: ["can't be blank"])
     end
 
-    if ActiveModel.version >= Gem::Version.new('6.1.0')
-      specify do
-        expect { post.validate }.to change { post.errors.details }
-          .to('author.user.email': [{ error: 'is invalid' }], name: [{ error: :blank }])
-      end
+    specify do
+      expect { post.validate }.to change { post.errors.details }
+        .to('author.user.email': [{ error: 'is invalid' }], name: [{ error: :blank }])
     end
 
     context 'when using symbol in error message of represented model' do

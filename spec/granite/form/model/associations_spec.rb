@@ -11,14 +11,17 @@ describe Granite::Form::Model::Associations do
       end
       stub_model(:user, Nobody) do
         include Granite::Form::Model::Associations
+
         embeds_many :projects
       end
       stub_model(:manager, Nobody) do
         include Granite::Form::Model::Associations
+
         embeds_one :managed_project, class_name: 'Project'
       end
       stub_model(:admin, User) do
         include Granite::Form::Model::Associations
+
         embeds_many :admin_projects, class_name: 'Project'
 
         alias_association :own_projects, :admin_projects

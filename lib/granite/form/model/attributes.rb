@@ -63,7 +63,7 @@ module Granite
             _attributes[_attribute_aliases[name] || name]
           end
 
-          def has_attribute?(name) # rubocop:disable Naming/PredicateName
+          def has_attribute?(name) # rubocop:disable Naming/PredicatePrefix
             name = name.to_s
             _attributes.key?(_attribute_aliases[name] || name)
           end

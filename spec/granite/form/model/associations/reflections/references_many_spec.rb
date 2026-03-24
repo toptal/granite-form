@@ -36,7 +36,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.creators << author }
-        .to change { book.creators }.from([]).to([author])
+        .to change { book.creators.to_a }.from([]).to([author])
     end
 
     specify do
@@ -49,6 +49,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         collection :author_names, String
         references_many :authors, primary_key: 'name'
       end
@@ -58,7 +59,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.author_names = [author.name] }
-        .to change { book.authors }.from([]).to([author])
+        .to change { book.authors.to_a }.from([]).to([author])
     end
 
     specify do
@@ -71,6 +72,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_many :authors, reference_key: 'identify'
       end
     end
@@ -79,7 +81,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.identify = [author.id] }
-        .to change { book.authors }.from([]).to([author])
+        .to change { book.authors.to_a }.from([]).to([author])
     end
 
     specify do
@@ -93,6 +95,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_many :authors
           references_many :owners, class_name: 'Author', default: default
         end
@@ -105,21 +108,21 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       specify { expect(book.owner_ids).to eq([author.id]) }
       specify { expect(book.owners).to eq([author]) }
       specify { expect { book.owners = [other] }.to change { book.owner_ids }.from([author.id]).to([other.id]) }
-      specify { expect { book.owners = [other] }.to change { book.owners }.from([author]).to([other]) }
+      specify { expect { book.owners = [other] }.to change { book.owners.to_a }.from([author]).to([other]) }
       specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([author.id]).to([other.id]) }
-      specify { expect { book.owner_ids = [other.id] }.to change { book.owners }.from([author]).to([other]) }
+      specify { expect { book.owner_ids = [other.id] }.to change { book.owners.to_a }.from([author]).to([other]) }
       specify { expect { book.owners = [] }.to change { book.owner_ids }.from([author.id]).to([]) }
-      specify { expect { book.owners = [] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owners = [] }.to change { book.owners.to_a }.from([author]).to([]) }
       specify { expect { book.owner_ids = [] }.not_to change { book.owner_ids }.from([author.id]) }
-      specify { expect { book.owner_ids = [] }.not_to change { book.owners }.from([author]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owners.to_a }.from([author]) }
       specify { expect { book.owner_ids = [nil] }.to change { book.owner_ids }.from([author.id]).to([]) }
-      specify { expect { book.owner_ids = [nil] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owners.to_a }.from([author]).to([]) }
       specify { expect { book.owner_ids = [''] }.to change { book.owner_ids }.from([author.id]).to([]) }
-      specify { expect { book.owner_ids = [''] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owners.to_a }.from([author]).to([]) }
       specify { expect { book.owner_ids = nil }.not_to change { book.owner_ids }.from([author.id]) }
-      specify { expect { book.owner_ids = nil }.not_to change { book.owners }.from([author]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owners.to_a }.from([author]) }
       specify { expect { book.owner_ids = '' }.to change { book.owner_ids }.from([author.id]).to([]) }
-      specify { expect { book.owner_ids = '' }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owners.to_a }.from([author]).to([]) }
     end
 
     it_behaves_like 'persisted default', -> { authors.map(&:id) }
@@ -129,6 +132,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       before do
         stub_model(:book) do
           include Granite::Form::Model::Associations
+
           references_many :authors
           references_many :owners, class_name: 'Author', default: default
         end
@@ -140,28 +144,34 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
       specify { expect(book.owner_ids).to eq([nil]) }
       specify { expect(book.owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
       specify { expect { book.owners = [other] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
-      specify { expect { book.owners = [other] }.to change { book.owners }.from([an_instance_of(Author)]).to([other]) }
+
+      specify do
+        expect { book.owners = [other] }.to change {
+          book.owners.to_a
+        }.from([an_instance_of(Author)]).to([other])
+      end
+
       specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
 
       specify do
         expect { book.owner_ids = [other.id] }
-          .to change { book.owners }
+          .to change { book.owners.to_a }
           .from([an_instance_of(Author)])
           .to([other])
       end
 
       specify { expect { book.owners = [] }.to change { book.owner_ids }.from([nil]).to([]) }
-      specify { expect { book.owners = [] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owners = [] }.to change { book.owners.to_a }.from([an_instance_of(Author)]).to([]) }
       specify { expect { book.owner_ids = [] }.not_to change { book.owner_ids }.from([nil]) }
-      specify { expect { book.owner_ids = [] }.not_to change { book.owners }.from([an_instance_of(Author)]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owners.to_a }.from([an_instance_of(Author)]) }
       specify { expect { book.owner_ids = [nil] }.to change { book.owner_ids }.from([nil]).to([]) }
-      specify { expect { book.owner_ids = [nil] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owners.to_a }.from([an_instance_of(Author)]).to([]) }
       specify { expect { book.owner_ids = [''] }.to change { book.owner_ids }.from([nil]).to([]) }
-      specify { expect { book.owner_ids = [''] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owners.to_a }.from([an_instance_of(Author)]).to([]) }
       specify { expect { book.owner_ids = nil }.not_to change { book.owner_ids }.from([nil]) }
-      specify { expect { book.owner_ids = nil }.not_to change { book.owners }.from([an_instance_of(Author)]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owners.to_a }.from([an_instance_of(Author)]) }
       specify { expect { book.owner_ids = '' }.to change { book.owner_ids }.from([nil]).to([]) }
-      specify { expect { book.owner_ids = '' }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owners.to_a }.from([an_instance_of(Author)]).to([]) }
     end
 
     it_behaves_like 'new record default', name: 'Author'
@@ -178,6 +188,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     before do
       stub_model(:book) do
         include Granite::Form::Model::Associations
+
         references_many :authors, ->(owner) { name_starts_with(owner.letter) }
         attribute :letter, String
       end
@@ -189,7 +200,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.authors = [author1, author2] }
-        .to change { book.authors }.from([]).to([author1, author2])
+        .to change { book.authors.to_a }.from([]).to([author1, author2])
     end
 
     specify do
@@ -199,7 +210,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.author_ids = [author1.id, author2.id] }
-        .to change { book.authors }.from([]).to([author2])
+        .to change { book.authors.to_a }.from([]).to([author2])
     end
 
     specify do
@@ -225,9 +236,9 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
       specify 'scope is not cached too much' do
         expect { book.author_ids = [author1.id, author2.id] }
-          .to change { book.authors }.from([]).to([author2])
+          .to change { book.authors.to_a }.from([]).to([author2])
         expect { book2.author_ids = [author1.id, author2.id] }
-          .to change { book2.authors }.from([]).to([author1])
+          .to change { book2.authors.to_a }.from([]).to([author1])
       end
     end
   end
@@ -238,7 +249,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     it { expect(book.authors).not_to respond_to(:create!) }
 
     describe '#clear' do
-      it { expect { book_with_author.authors.clear }.to change { book_with_author.authors }.from([author]).to([]) }
+      it { expect { book_with_author.authors.clear }.to change { book_with_author.authors.to_a }.from([author]).to([]) }
     end
 
     describe '#reload' do
@@ -248,13 +259,13 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
     end
 
     describe '#concat' do
-      it { expect { book.authors.concat author }.to change { book.authors }.from([]).to([author]) }
-      it { expect { book.authors << author << other }.to change { book.authors }.from([]).to([author, other]) }
+      it { expect { book.authors.concat author }.to change { book.authors.to_a }.from([]).to([author]) }
+      it { expect { book.authors << author << other }.to change { book.authors.to_a }.from([]).to([author, other]) }
 
       context 'no duplication' do
         before { book.authors << author }
 
-        it { expect { book.authors.concat author }.not_to change { book.authors }.from([author]) }
+        it { expect { book.authors.concat author }.not_to change { book.authors.to_a }.from([author]) }
       end
     end
 
@@ -270,36 +281,36 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     xit do
       expect { book_with_author.author_ids << other.id }
-        .to change { book_with_author.authors }
+        .to change { book_with_author.authors.to_a }
         .from([author])
         .to([author, other])
     end
 
     it {
       expect { book_with_author.author_ids = [other.id] }
-        .to change { book_with_author.authors }
+        .to change { book_with_author.authors.to_a }
         .from([author])
         .to([other])
     }
   end
 
   describe '#authors=' do
-    specify { expect { book.authors = [author] }.to change { book.authors }.from([]).to([author]) }
+    specify { expect { book.authors = [author] }.to change { book.authors.to_a }.from([]).to([author]) }
     specify { expect { book.authors = ['string'] }.to raise_error Granite::Form::AssociationTypeMismatch }
 
     context do
       before { book.authors = [other] }
 
-      specify { expect { book.authors = [author] }.to change { book.authors }.from([other]).to([author]) }
+      specify { expect { book.authors = [author] }.to change { book.authors.to_a }.from([other]).to([author]) }
       specify { expect { book.authors = [author] }.to change { book.author_ids }.from([other.id]).to([author.id]) }
-      specify { expect { book.authors = [] }.to change { book.authors }.from([other]).to([]) }
+      specify { expect { book.authors = [] }.to change { book.authors.to_a }.from([other]).to([]) }
       specify { expect { book.authors = [] }.to change { book.author_ids }.from([other.id]).to([]) }
     end
 
     context 'model not persisted' do
       let(:author) { Author.new }
 
-      specify { expect { book.authors = [author, other] }.to change { book.authors }.from([]).to([author, other]) }
+      specify { expect { book.authors = [author, other] }.to change { book.authors.to_a }.from([]).to([author, other]) }
       specify { expect { book.authors = [author, other] }.to change { book.author_ids }.from([]).to([nil, other.id]) }
 
       context do
@@ -317,11 +328,11 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
   describe '#author_ids=' do
     specify { expect { book.author_ids = [author.id] }.to change { book.author_ids }.from([]).to([author.id]) }
-    specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([]).to([author]) }
-    specify { expect { book.author_ids = [author] }.to change { book.authors }.from([]).to([author]) }
+    specify { expect { book.author_ids = [author.id] }.to change { book.authors.to_a }.from([]).to([author]) }
+    specify { expect { book.author_ids = [author] }.to change { book.authors.to_a }.from([]).to([author]) }
 
     specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.author_ids }.from([]) }
-    specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.authors }.from([]) }
+    specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.authors.to_a }.from([]) }
 
     specify do
       expect { book.author_ids = [author.id.next.to_s, author.id] }
@@ -332,7 +343,7 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
 
     specify do
       expect { book.author_ids = [author.id.next.to_s, author.id] }
-        .to change { book.authors }
+        .to change { book.authors.to_a }
         .from([])
         .to([author])
     end
@@ -347,9 +358,9 @@ describe Granite::Form::Model::Associations::Reflections::ReferencesMany do
           .to([author.id])
       end
 
-      specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([other]).to([author]) }
+      specify { expect { book.author_ids = [author.id] }.to change { book.authors.to_a }.from([other]).to([author]) }
       specify { expect { book.author_ids = [] }.to change { book.author_ids }.from([other.id]).to([]) }
-      specify { expect { book.author_ids = [] }.to change { book.authors }.from([other]).to([]) }
+      specify { expect { book.author_ids = [] }.to change { book.authors.to_a }.from([other]).to([]) }
     end
   end
 end

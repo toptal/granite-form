@@ -6,7 +6,7 @@ module Granite
           class EmbedsOne < EmbedsAny
             include Singular
 
-            def self.build(target, generated_methods, name, options = {}, &block)
+            def self.build(target, generated_methods, name, options = {}, &_block)
               if target < Granite::Form::Model::Attributes
                 target.add_attribute(Granite::Form::Model::Attributes::Reflections::Base, name,
                                      type: Object)
