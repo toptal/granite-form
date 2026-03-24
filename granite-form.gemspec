@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.summary = 'Working with hashes in AR style'
   gem.homepage = 'https://github.com/toptal/granite-form'
 
-  gem.files = ['lib/**/*.rb']
+  gem.files = Dir['lib/**/*.rb']
   gem.name = 'granite-form'
   gem.require_paths = ['lib']
   gem.required_ruby_version = '>= 3.3'
