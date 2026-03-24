@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/toptal/granite-form.png?branch=master)](https://travis-ci.org/toptal/granite-form)
-[![Code Climate](https://codeclimate.com/github/toptal/granite-form.png)](https://codeclimate.com/github/toptal/granite-form)
-
 # Granite::Form
 
 `Granite::Form` is an `ActiveModel`-based front-end for your data. It is useful in the following cases:
