@@ -156,7 +156,7 @@ If type for an attribute is not set, it defaults to `Object`. It is therefore re
 The type is necessary for attribute typecasting. Here is the list of pre-defined basic typecasters:
 
 ```irb
-[1] pry(main)> Granite::Form._typecasters.keys
+[1] irb(main)> Granite::Form._typecasters.keys
 => ["Object", "String", "Array", "Hash", "Date", "DateTime", "Time", "ActiveSupport::TimeZone", "BigDecimal", "Float", "Integer", "Boolean", "Granite::Form::UUID"]
 ```
 
@@ -221,11 +221,11 @@ end
 A collection typecasts each value to the specified type. Also, it normalizes any given value to an array.
 
 ```irb
-[1] pry(main)> Panda.new
+[1] irb(main)> Panda.new
 => #<Panda ids: []>
-[2] pry(main)> Panda.new(ids: 42)
+[2] irb(main)> Panda.new(ids: 42)
 => #<Panda ids: [42]>
-[3] pry(main)> Panda.new(ids: [42, '33'])
+[3] irb(main)> Panda.new(ids: [42, '33'])
 => #<Panda ids: [42, 33]>
 ```
 
@@ -244,9 +244,9 @@ end
 ```
 
 ```irb
-[1] pry(main)> Foo.new
+[1] irb(main)> Foo.new
 => #<Foo ordering: {}>
-[2] pry(main)> Foo.new(ordering: {name: :desc})
+[2] irb(main)> Foo.new(ordering: {name: :desc})
 => #<Foo ordering: {"name"=>"desc"}>
 ```
 

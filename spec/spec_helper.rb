@@ -1,5 +1,5 @@
 require 'bundler'
-require 'pry'
+require 'debug'
 Bundler.require
 
 require 'rspec/its'
