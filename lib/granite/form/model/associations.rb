@@ -57,7 +57,7 @@ module Granite
 
           def alias_association(alias_name, association_name)
             reflection = reflect_on_association(association_name)
-            raise ArgumentError, "Can't alias undefined association `#{attribute_name}` on #{self}" unless reflection
+            raise ArgumentError, "Can't alias undefined association `#{association_name}` on #{self}" unless reflection
 
             reflection.class.generate_methods alias_name, generated_associations_methods
             self._association_aliases = _association_aliases.merge(alias_name.to_sym => reflection.name)
