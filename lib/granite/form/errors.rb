@@ -28,7 +28,7 @@ module Granite
       def initialize(object, association_name, record_id)
         primary_name = object.respond_to?(:_primary_name) ? object._primary_name : 'id'
         message = "Couldn't find #{object.class.reflect_on_association(association_name).klass.name}" \
-                  "with #{primary_name} = #{record_id} for #{object.inspect}"
+                  " with #{primary_name} = #{record_id} for #{object.inspect}"
         super(message)
       end
     end
@@ -60,7 +60,7 @@ module Granite
           You can define it with:
 
             Granite::Form.normalizer(:#{name}) do |value, options|
-              # do some staff with value and options
+              # do some stuff with value and options
             end
         MESSAGE
       end
@@ -74,7 +74,7 @@ module Granite
           You can define it with:
 
             Granite::Form.typecaster('#{classes.first}') do |value|
-              # do some staff with value and options
+              # do some stuff with value and options
             end
         MESSAGE
       end
